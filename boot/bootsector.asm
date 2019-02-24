@@ -5,13 +5,13 @@
 [org 0x7c00]
 
 
-mov bx, my_string
-call print_string
+; mov bx, my_string
+; call print_string
 
-mov bx, GOODBYE
-call print_string
+; mov bx, GOODBYE
+; call print_string
 
-mov dx, 0x1337
+mov dx, 0x4810
 call print_hex
 
 jmp $

@@ -1,7 +1,7 @@
 ; Use dx as the parameter value to print
 print_hex:
 	pusha
-	mov bx, 2 ; start after 0x
+	mov bx, 5 ; start after 0x
 print_hex_loop:
 	mov al, dl
 	and al, 0xf 
@@ -11,8 +11,8 @@ print_hex_loop:
 	add al, 7
 less_then_a:
 	mov [HEX_OUT + bx], al
-	inc bx
-	cmp bx, 6 ; check if we filled all 4 bytes
+	dec bx
+	cmp bx, 1 ; check if we filled all 4 bytes
 	je end_print_hex
 	ror dx, 4
 	jmp print_hex_loop
@@ -22,7 +22,6 @@ end_print_hex:
 	call print_string
 	popa
 	ret
-
 
 HEX_OUT:
 	db '0x0000', 0
