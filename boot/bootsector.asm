@@ -4,25 +4,22 @@
 ; corrects the offsets
 [org 0x7c00]
 
-mov ah, 0x0e ; int 0x10 with ah = 0x0e -> means scrolling teletype
 
 mov bx, my_string
-loop:
-	cmp [bx], dword 0
-	je endloop
+call print_string
 
-	mov al, [bx]
-	int 0x10
-	add bx, word 1
-
-	jne loop
-
-endloop:
+mov bx, GOODBYE
+call print_string
 
 jmp $
 
+%include "print_string.asm"
+
 my_string:
 	db 'Hello there!',0
+
+GOODBYE:
+	db 'Goodbye',0
 
 ;$$ is the start of the current position
 ;$ is the address of current position
