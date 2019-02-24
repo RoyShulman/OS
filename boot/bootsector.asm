@@ -11,9 +11,40 @@ call print_string
 mov bx, GOODBYE
 call print_string
 
+mov dx, 0x1337
+call print_hex
+
 jmp $
 
+; Use dx as the parameter value to print
+print_hex:
+	pusha
+	mov bx, 2
+print_hex_loop:
+	ror dx, 4 ; Get the 4 lowest bits in the number 
+	mov al, dl
+	and al, 0xf
+	add al, '0'
+	cmp al, '9'
+	jbe lessA
+	add al, 7
+lessA:
+	mov [HEX_OUT + bx], al
+	inc bx
+	cmp bx, 6
+	je end_print_hex
+	jmp print_hex_loop
+
+end_print_hex:
+	mov bx, HEX_OUT
+	call print_string
+	popa
+	ret
+
 %include "print_string.asm"
+
+HEX_OUT:
+	db '0x0000', 0
 
 my_string:
 	db 'Hello there!',0

@@ -9,7 +9,7 @@ loop:
 
     mov al, [bx]
     int 0x10
-    add bx, byte 1
+    inc bx
     jmp loop
 
 endloop:
