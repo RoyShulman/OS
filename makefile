@@ -1,11 +1,12 @@
 BOOTDIR=./boot
 
-
 .PHONY: all
 all: os
 
 # Make os rely on setup first
-os: | setup bootsector.bin
+# os: | setup bootsector.bin
+	# qemu-system-x86_64 ./boot/bootsector.bin 
+os: bootsector.bin
 	qemu-system-x86_64 ./boot/bootsector.bin
 
 %.bin: $(BOOTDIR)/%.asm
