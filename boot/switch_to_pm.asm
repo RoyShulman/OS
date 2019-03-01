@@ -8,7 +8,8 @@ switch_to_pm:
 	mov cr0, eax	; Make the actual switch to protected mode
 
 	jmp CODE_SEG:init_pm 	; Make a far jump to our 32 bit code. This forces the CPU to flush its cache of prefetched 
-							; and real mode decoded instructions
+							; and real mode decoded instructions. This also sets cs to be the CODE_SEG which is what
+							; we will do for all the data segment registers(far jmp is cs:ip so this is like mov cs, CODE_SEG)
 
 [bits 32]
 ; Init the stack and registers once in pm
@@ -20,9 +21,6 @@ init_pm:
 	mov es, ax
 	mov fs, ax
 	mov gs, ax
-
-	; mov ax, CODE_SEG ; TODO: why does this cause everything to fail?
-	; mov cs, ax
 
 	mov ebp, 0x90000 	; move stack position to be right at the top of the free space
 
