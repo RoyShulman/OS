@@ -4,6 +4,7 @@ LD=ld
 CFLAGS=-W -Wall -pedantic -std=c11 -m32 -ffreestanding
 LDFLAGS=--oformat binary -Ttext 0x1000 -m elf_i386
 SOURCES=$(shell find . -name "*.c")
+HEADERS=$(shell find . -name "*.h")
 OBJECTS=$(SOURCES:%.c=%.o)
 TARGET_DIR=./src/bin
 TARGET=kernel.bin
@@ -23,11 +24,11 @@ os: bootsector.bin kernel.bin
 		mkdir $(TARGET_DIR)
 		nasm $< -f bin -I $(BOOTDIR)/ -o $(TARGET_DIR)/$@
 
-$(TARGET): $(KERNEL_SOURCE)/kernel_entry.o $(OBJECTS) # The order here is important, 
-	$(LD) $(LDFLAGS) $^ -o $(TARGET_DIR)/$@ 		  # we always want kernel entry.o first	
+$(TARGET): $(KERNEL_SOURCE)/kernel_entry.o $(OBJECTS) # The order here is important, We always want to have kernel_entry first 
+	$(LD) -o $(TARGET_DIR)/$@ $(LDFLAGS) $^ 	
 
-$(OBJECTS): $(SOURCES)
-	$(CC) $(CFLAGS) -c $^ -o $@
+%.o: %.c %.h
+	$(CC) $(CFLAGS) -c $< -o $@
 
 %.o: %.asm
 	nasm $< -f elf32 -I boot/ -o $@
@@ -39,7 +40,7 @@ setup:
 
 .PHONY: clean
 clean:
-	rm -rf $(TARGET_DIR) $(OBJECTS)
+	rm -rf $(TARGET_DIR) $(shell find ./src -name "*.o")
 
 .PHONY: run
 run:
