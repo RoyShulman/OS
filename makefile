@@ -15,13 +15,14 @@ all: os
 # os: | setup bootsector.bin
 	# qemu-system-x86_64 ./boot/bootsector.bin 
 os: bootsector.bin kernel.bin
-	qemu-system-x86_64 $(BOOTDIR)/bootsector.bin
+	cat $(TARGET_DIR)/bootsector.bin $(TARGET_DIR)/kernel.bin > $(TARGET_DIR)/os_image
+	qemu-system-x86_64 $(TARGET_DIR)/os_image
 
 %.bin: $(BOOTDIR)/%.asm
-		nasm $< -f bin -I $(BOOTDIR)/ -o $(BOOTDIR)/$@
+		mkdir $(TARGET_DIR)
+		nasm $< -f bin -I $(BOOTDIR)/ -o $(TARGET_DIR)/$@
 
 $(TARGET): $(OBJECTS)
-	mkdir $(TARGET_DIR)
 	$(LD) $(LDFLAGS) $^ -o $(TARGET_DIR)/$@
 
 $(OBJECTS): $(SOURCES)
@@ -35,3 +36,10 @@ setup:
 .PHONY: clean
 clean:
 	rm -rf $(TARGET_DIR) $(OBJECTS)
+
+.PHONY: run
+run:
+	qemu-system-x86_64 $(TARGET_DIR)/os_image
+
+.PHONY: rebuild
+rebuild: | clean all
