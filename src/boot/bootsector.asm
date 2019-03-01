@@ -25,7 +25,7 @@ load_kernel:
 	mov bx, MSG_LOAD_KERNEL
 	call print_string
 
-	mov bx, KERNEL_OFFSET 	; Load the first 15 sectors excluding the boot sector
+	mov bx, KERNEL_OFFSET 	; Load the first 15(just to be safe) sectors excluding the boot sector
 	mov dh, 15				; from our boot drive into the address 0x1000 which is the KERNEL_OFFSET
 	mov dl, [BOOT_DRIVE]
 	call disk_load

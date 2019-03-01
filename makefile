@@ -7,6 +7,7 @@ SOURCES=$(shell find . -name "*.c")
 OBJECTS=$(SOURCES:%.c=%.o)
 TARGET_DIR=./src/bin
 TARGET=kernel.bin
+KERNEL_SOURCE=./src/kernel
 
 .PHONY: all
 all: os
@@ -22,11 +23,14 @@ os: bootsector.bin kernel.bin
 		mkdir $(TARGET_DIR)
 		nasm $< -f bin -I $(BOOTDIR)/ -o $(TARGET_DIR)/$@
 
-$(TARGET): $(OBJECTS)
-	$(LD) $(LDFLAGS) $^ -o $(TARGET_DIR)/$@
+$(TARGET): $(KERNEL_SOURCE)/kernel_entry.o $(OBJECTS) # The order here is important, 
+	$(LD) $(LDFLAGS) $^ -o $(TARGET_DIR)/$@ 		  # we always want kernel entry.o first	
 
 $(OBJECTS): $(SOURCES)
 	$(CC) $(CFLAGS) -c $^ -o $@
+
+%.o: %.asm
+	nasm $< -f elf32 -I boot/ -o $@
 
 .PHONY: setup
 setup:
