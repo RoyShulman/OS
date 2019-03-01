@@ -17,8 +17,8 @@ again:
 
 	sub [SECTORS], al ; Remaining to read because the bios read the number of read sectors into al
 	jz done
-	mov cl, 0x01 ; Always read sector 1 from now ?????
-	xor dh, 0x01 ; The next head ????????
+	mov cl, 0x01 ; Start reading from sector 1 from now on
+	xor dh, 0x01 ; Select the second head, and exit after it
 	jnz next_group
 	inc ch ; Next cylinder
 	jmp next_group

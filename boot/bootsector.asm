@@ -5,38 +5,36 @@
 ; corrects the offsets
 [org 0x7c00]
 
-mov [BOOT_DRIVE], dl ; The boot drive index is stored in dl and it's usually 0x80
-mov bp, 0x8000
+mov bp, 0x9000	; move the stack
 mov sp, bp
 
-; call get_drive_parameters
+mov bx, MSG_REAL_MODE
+call print_string
 
-; Load 5 sectors into ES:BX (0x0000 + 0x9000) from the boot disk
-mov bx, 0x9000
-mov dh, 5
-mov dl, [BOOT_DRIVE]
-call disk_load
-
-mov dx, [0x9000]
-call print_hex
-
-mov dx, [0x9000 + 512]
-call print_hex
+call switch_to_pm ; Never return
 
 jmp $
 
 %include "print_string.asm"
 %include "print_hex.asm"
 %include "read_disk.asm"
+%include "gdt.asm"
+%include "switch_to_pm.asm"
 
-BOOT_DRIVE:
-	db 0
+[bits 32]:
+; Arrive here after switching and initializing pm
+BEGIN_PM:
+	mov ebx, MSG_PROT_MODE
+	call print_string_pm
+
+	jmp $
+
+MSG_REAL_MODE	db "Started in 16 bit real mode", 0
+MSG_PROT_MODE	db "Successfully landed in 32 bit protected code", 0
+
 ;$$ is the start of the current position
 ;$ is the address of current position
 ;$-$$ is how far from the start we are. We need to fill bytes until byte 511 and 512
 times 510-($-$$) db 0
 ; Little endian
 dw 0xaa55
-
-times 256 dw 0xdada
-times 256 dw 0xface
