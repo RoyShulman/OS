@@ -21,6 +21,8 @@ init_pm:
 	mov fs, ax
 	mov gs, ax
 
+	; mov ax, CODE_SEG ; TODO: why does this cause everything to fail?
+	; mov cs, ax
 
 	mov ebp, 0x90000 	; move stack position to be right at the top of the free space
 
