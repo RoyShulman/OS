@@ -1,3 +1,4 @@
+[bits 16]
 ; Use dx as the parameter value to print
 print_hex:
 	pusha

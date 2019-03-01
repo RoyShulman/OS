@@ -1,3 +1,4 @@
+[bits 16]
 ; load DH num sectors to ES:BX from drive DL
 disk_load:
 	mov [SECTORS], dh ; So we remeber how many we need to read

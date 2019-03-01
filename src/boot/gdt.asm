@@ -1,3 +1,4 @@
+[bits 16]
 ; GDT - Global Descriptor Table
 ; We define a basic flat model in which the sectors overlap and cover all 4GB of addressable memory
 gdt_start:
