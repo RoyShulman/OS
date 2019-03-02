@@ -6,7 +6,7 @@ void copy_memory(char* source, char* dest, int num_bytes) {
 	}
 }
 
-void itoa(const int num, char* str) {
+void itoa(int num, char* str) {
 	int i = 0;
 	char is_negative = 0;
 
@@ -45,8 +45,8 @@ void reverse(char* string) {
 	for (int i = 0; i < (len / 2); i++) {
 		char temp;
 		temp = string[i];
-		string[i] = string[len - i];
-		string[len -i] = temp;
+		string[i] = string[len - i - 1];
+		string[len - 1 - i] = temp;
 	}
 }
 

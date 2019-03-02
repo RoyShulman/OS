@@ -35,7 +35,7 @@ void reverse(char* string);
 /**
  * @brief      Calculate the length of a null terminated string
  *
- * @param      string  The string
+ * @param[inout]      string  The string
  *
  * @return     len of the string
  */
