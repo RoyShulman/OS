@@ -65,6 +65,16 @@ void clear_screen();
  *
  * @return     The screen offset in the VGA
  */
- int get_screen_offset(const int col, const int row);
+int get_screen_offset(const int col, const int row);
+
+/**
+ * @brief      Move the screen down when we reach the bottom of the screen.
+ * 			   This is done by copying all rows up and having the bottom empty 
+ *
+ * @param[in]  offset  The offset in which we are currently at
+ *
+ * @return     Updated cursor position
+ */
+int handle_scrolling(const int curser_offset);
 
 #endif

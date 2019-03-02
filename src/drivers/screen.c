@@ -1,4 +1,5 @@
 #include "screen.h"
+#include "../kernel/utils.h"
 
 #include "IO.h"
 
@@ -37,7 +38,7 @@ void print_char(char character, int col, int row, char attribute_byte) {
 	offset += next_offset;
 
 	// Adjust the scrolling when we reach the bottom of the screen
-	// offset = handle_scrolling(offset);
+	offset = handle_scrolling(offset);
 
 	// Update the cursor position
 	set_cursor(offset);
@@ -119,4 +120,29 @@ int get_screen_offset(const int col, const int row) {
 	// To calculate we use ((row * MAX_COL) + col) * cell_size
 	int cell_size = 2;
 	return (((row * MAX_COLS) + col) * cell_size);
+}
+
+int handle_scrolling(const int curser_offset) {
+	int cell_size = 2;
+	int vga_buffer_size = MAX_ROWS * MAX_COLS * cell_size;
+	// If offset is inside the vga, return the offset unmodified
+	if (curser_offset < vga_buffer_size) {
+		return curser_offset;
+	}
+
+	// Shift rows back one, starting from index 1
+	for (int i = 1; i < MAX_ROWS; i++) {
+		copy_memory((char*) (get_screen_offset(0, i) + VIDEO_ADDRESS),
+					(char*) (get_screen_offset(0, i -1) + VIDEO_ADDRESS),
+					MAX_COLS * cell_size);
+		// Blank the last line
+	}
+	char* last_line = (char*) (get_screen_offset(0, MAX_ROWS - 1) + VIDEO_ADDRESS);
+	for (int i = 0; i < MAX_COLS * cell_size; i++) {
+		last_line[i] = 0;
+	}
+	// Set the curser to be on the last row, rather than the edge of the screen
+	int new_curser_offset = curser_offset - 2 * MAX_COLS;
+
+	return new_curser_offset;
 }

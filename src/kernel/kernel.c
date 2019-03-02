@@ -6,5 +6,5 @@ void main() {
 	*video_memory = 'X';
 
 	clear_screen();	
-	print("hello!");
+	print("hello\ngoodbye");
 }
