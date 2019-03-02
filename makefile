@@ -1,7 +1,7 @@
 BOOTDIR=./src/boot
 CC=gcc
 LD=ld
-CFLAGS=-W -Wall -pedantic -std=c11 -m32 -ffreestanding
+CFLAGS=-Werror -g -Wextra -Wall -pedantic -std=c11 -m32 -ffreestanding
 LDFLAGS=--oformat binary -Ttext 0x1000 -m elf_i386
 SOURCES=$(shell find . -name "*.c")
 HEADERS=$(shell find . -name "*.h")
@@ -9,16 +9,24 @@ OBJECTS=$(SOURCES:%.c=%.o)
 TARGET_DIR=./src/bin
 TARGET=kernel.bin
 KERNEL_SOURCE=./src/kernel
+GDB=gdb
+
+.PHONY: run
+run: os_image
+	qemu-system-x86_64 $(TARGET_DIR)/$<
 
 .PHONY: all
-all: os
+all: os_image
 
-# Make os rely on setup first
-# os: | setup bootsector.bin
-	# qemu-system-x86_64 ./boot/bootsector.bin 
-os: bootsector.bin kernel.bin
+debug: os_image kernel.elf
+	qemu-system-x86_64 -s $(TARGET_DIR)/$< &
+	$(GDB) -ex "target remote localhost:1234" -ex "symbol-file ./src/bin/kernel.elf"
+
+kernel.elf: $(KERNEL_SOURCE)/kernel_entry.o $(OBJECTS)
+	$(LD) -o $(TARGET_DIR)/$@ -Ttext 0x1000 -m elf_i386 $^
+
+os_image: bootsector.bin kernel.bin
 	cat $(TARGET_DIR)/bootsector.bin $(TARGET_DIR)/kernel.bin > $(TARGET_DIR)/os_image
-	qemu-system-x86_64 $(TARGET_DIR)/os_image
 
 %.bin: $(BOOTDIR)/%.asm
 		mkdir $(TARGET_DIR)
