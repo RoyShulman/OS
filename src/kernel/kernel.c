@@ -1,10 +1,12 @@
 #include "../drivers/screen.h"
 #include "utils.h"
+#include "isr.h"
 
 void main() {
-	char* video_memory = (char*) 0xb8000;
-	*video_memory = 'X';
 
 	clear_screen();
-	print("hello\ngoodbye\n");
+	isr_install();
+	
+	__asm__ __volatile__("int $2");
+	__asm__ __volatile__("int $3");
 }

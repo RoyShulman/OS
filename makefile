@@ -4,8 +4,10 @@ LD=ld
 CFLAGS=-Werror -g -Wextra -Wall -pedantic -std=c11 -m32 -ffreestanding
 LDFLAGS=--oformat binary -Ttext 0x1000 -m elf_i386
 SOURCES=$(shell find . -name "*.c")
+ASM_SOURCES=$(shell find . -name "*.asm" -not -path "./src/boot/*")
 HEADERS=$(shell find . -name "*.h")
 OBJECTS=$(SOURCES:%.c=%.o)
+OBJECTS+=$(ASM_SOURCES:%.asm=%.o)
 TARGET_DIR=./src/bin
 TARGET=kernel.bin
 KERNEL_SOURCE=./src/kernel
