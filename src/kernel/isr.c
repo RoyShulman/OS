@@ -69,7 +69,11 @@ void isr_install() {
 }
 
 /* To print the message which defines every exception */
-const char *exception_messages[] = {
+// TODO: why is this empty during run time 
+
+
+void isr_handler(registers_t r) {
+    const char *exception_messages[] = {
     "Division By Zero",
     "Debug",
     "Non Maskable Interrupt",
@@ -108,8 +112,6 @@ const char *exception_messages[] = {
 };
 
 
-
-void isr_handler(registers_t r) {
     print("received interrupt: ");
     char s[3];
     itoa(r.int_no, s);
