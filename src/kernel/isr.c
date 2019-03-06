@@ -7,6 +7,7 @@
 /* Can't do this with a loop because we need the address
  * of the function names */
 void isr_install() {
+
     set_idt_gate(0, (unsigned int)isr0);
     set_idt_gate(1, (unsigned int)isr1);
     set_idt_gate(2, (unsigned int)isr2);
@@ -91,3 +92,4 @@ void isr_handler(registers_t r) {
     print(exception_messages[r.int_no]);
     print("\n");
 }
+    

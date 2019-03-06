@@ -1,45 +1,44 @@
 #ifndef IDT_H
 #define IDT_H
 
-/* Segment selectors */
-#define KERNEL_CS 0x08
+#define GDT_KERNEL_CODE_SEG (0x8)
 
-/* How every interrupt gate (handler) is defined */
 typedef struct {
-    unsigned short low_offset; /* Lower 16 bits of handler function address */
-    unsigned short sel; /* Kernel segment selector */
-    unsigned char always0;
-    /* First byte
-     * Bit 7: "Interrupt is present"
-     * Bits 6-5: Privilege level of caller (0=kernel..3=user)
-     * Bit 4: Set to 0 for interrupt gates
-     * Bits 3-0: bits 1110 = decimal 14 = "32 bit interrupt gate" */
-    unsigned char flags; 
-    unsigned short high_offset; /* Higher 16 bits of handler function address */
-} __attribute__((packed)) idt_gate_t ;
+    unsigned short low_offset;  // offset bits 0-15 of entry point of ISR
+    unsigned short selector;    // code segment descriptor in gdt
+    unsigned char zero;         // unused
+    unsigned char attributes;    
+    /*
+     * Bit 7:       Interrupt present
+     * Bits 6-5:    Privilege level of caller
+     * bit 4:       Set to 0 for interrupt gate
+     * Bit 3-0:     1110 - 32 bit interrupt gate
+     */
+    unsigned short high_offset;  // offset bits 16-31 of entry point of ISR
+} __attribute__((packed)) idt_gate_t;
 
-/* A pointer to the array of interrupt handlers.
- * Assembly instruction 'lidt' will read it */
+// Pointer to the array of interrupt descriptors
+// Load with lidt
 typedef struct {
     unsigned short limit;
     unsigned int base;
 } __attribute__((packed)) idt_register_t;
 
-#define IDT_ENTRIES 256
-idt_gate_t idt[IDT_ENTRIES];
+#define IDT_ENTRIES (256)
 idt_register_t idt_reg;
+idt_gate_t idt[IDT_ENTRIES];
 
 /**
- * @brief      Sets the idt gate.
- *
- * @param[in]  n        The index in idt_gate 
- * @param[in]  handler  The handler function address
- */
-void set_idt_gate(int n, unsigned int handler);
-
-/**
- * @brief      Sets the idt.
+ * @brief      Sets the idt
  */
 void set_idt();
+
+/**
+ * @brief      Sets the idt descriptor.
+ *
+ * @param[in]  index     The index of interrupt
+ * @param[in]  offset    The offset of the isr
+ */
+void set_idt_gate(int num, unsigned int offset);
 
 #endif
