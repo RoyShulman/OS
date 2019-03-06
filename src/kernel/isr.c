@@ -1,8 +1,12 @@
 #include "idt.h"
 #include "utils.h"
 #include "../drivers/screen.h"
+#include "../drivers/IO.h"
 
 #include "isr.h"
+
+isr_handler_ptr_t interrupt_handlers[256];
+
 
 /* Can't do this with a loop because we need the address
  * of the function names */
@@ -41,11 +45,31 @@ void isr_install() {
     set_idt_gate(30, (unsigned int)isr30);
     set_idt_gate(31, (unsigned int)isr31);
 
+    remap_irq();
+
+     // Install the IRQs
+    set_idt_gate(32, (unsigned int)irq0);
+    set_idt_gate(33, (unsigned int)irq1);
+    set_idt_gate(34, (unsigned int)irq2);
+    set_idt_gate(35, (unsigned int)irq3);
+    set_idt_gate(36, (unsigned int)irq4);
+    set_idt_gate(37, (unsigned int)irq5);
+    set_idt_gate(38, (unsigned int)irq6);
+    set_idt_gate(39, (unsigned int)irq7);
+    set_idt_gate(40, (unsigned int)irq8);
+    set_idt_gate(41, (unsigned int)irq9);
+    set_idt_gate(42, (unsigned int)irq10);
+    set_idt_gate(43, (unsigned int)irq11);
+    set_idt_gate(44, (unsigned int)irq12);
+    set_idt_gate(45, (unsigned int)irq13);
+    set_idt_gate(46, (unsigned int)irq14);
+    set_idt_gate(47, (unsigned int)irq15);
+
     set_idt(); // Load with ASM
 }
 
 /* To print the message which defines every exception */
-char *exception_messages[] = {
+const char *exception_messages[] = {
     "Division By Zero",
     "Debug",
     "Non Maskable Interrupt",
@@ -83,6 +107,8 @@ char *exception_messages[] = {
     "Reserved"
 };
 
+
+
 void isr_handler(registers_t r) {
     print("received interrupt: ");
     char s[3];
@@ -93,3 +119,39 @@ void isr_handler(registers_t r) {
     print("\n");
 }
     
+void remap_irq() {
+    port_byte_out(MASTER_PIC_COMMAND, 0x11);    // Write Init to master
+    port_byte_out(SLAVE_PIC_COMMAND, 0x11);     // Write init to slave
+
+    port_byte_out(MASTER_PIC_DATA, 0x20);       // remap master pic to 0x20
+    port_byte_out(SLAVE_PIC_DATA, 0x28);        // remap slave pic to 0x28 
+
+    port_byte_out(MASTER_PIC_DATA, 0x04);       // IRQ2 -> connection to slave
+    port_byte_out(SLAVE_PIC_DATA, 0x02);
+
+    port_byte_out(MASTER_PIC_DATA, 0x01);       // Write init4 to the master pic
+    port_byte_out(SLAVE_PIC_DATA, 0x01);        // write init4 to the slave pic
+
+    port_byte_out(MASTER_PIC_DATA, 0x0);        // enable all IRQs on master PIC
+    port_byte_out(SLAVE_PIC_DATA, 0x0);         // enable all IRQs on slave PIC
+}
+
+void register_interrupt_handler(unsigned char int_num, isr_handler_ptr_t handler) {
+    interrupt_handlers[int_num] = handler;
+}
+
+void irq_handler(registers_t r) {
+    /* We need to send PIC end of interrupt after we finish dealing with
+     * the current one or else we won't get anymore
+    */
+    if (r.int_no >= 40) {
+        // If the interrupt came from slave, we must write to it as well
+        port_byte_out(SLAVE_PIC_COMMAND, PIC_EOI);
+    } 
+    port_byte_out(MASTER_PIC_COMMAND, PIC_EOI);
+    // handle the interrupt in a moduler way
+    if (interrupt_handlers[r.int_no] != 0) {
+        isr_handler_ptr_t handler = interrupt_handlers[r.int_no];
+        handler(r);
+    }
+}
