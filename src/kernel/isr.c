@@ -109,7 +109,7 @@ void isr_handler(registers_t r) {
     "Reserved",
     "Reserved",
     "Reserved"
-};
+    };
 
 
     print("received interrupt: ");
