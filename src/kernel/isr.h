@@ -101,6 +101,13 @@ typedef void (*isr_handler_ptr_t)(registers_t);
  */
 void register_interrupt_handler(unsigned char int_num, isr_handler_ptr_t handler);
 
+/**
+ * @brief      Unregisters the interrupt handler
+ *
+ * @param[in]  int_num  The interrupt number
+ */
+void unregister_interrupt_handler(unsigned char int_num);
+
 #define MASTER_PIC_COMMAND		(0x20)
 #define MASTER_PIC_DATA			(0x21)
 #define SLAVE_PIC_COMMAND		(0xa0)

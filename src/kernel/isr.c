@@ -157,3 +157,7 @@ void irq_handler(registers_t r) {
         handler(r);
     }
 }
+
+void unregister_interrupt_handler(unsigned char int_num) {
+    interrupt_handlers[int_num] = NULL;
+}
