@@ -1,6 +1,8 @@
 #ifndef ISR_H
 #define ISR_H
 
+#include <stdint.h>
+
 /* ISRs reserved for CPU exceptions */
 extern void isr0();
 extern void isr1();
@@ -72,10 +74,10 @@ extern void irq15();
 
 /* Struct which aggregates many registers */
 typedef struct {
-   unsigned int ds; /* Data segment selector */
-   unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax; /* Pushed by pusha. */
-   unsigned int int_no, err_code; /* Interrupt number and error code (if applicable) */
-   unsigned int eip, cs, eflags, useresp, ss; /* Pushed by the processor automatically */
+   uint32_t ds; /* Data segment selector */
+   uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; /* Pushed by pusha. */
+   uint32_t int_no, err_code; /* Interrupt number and error code (if applicable) */
+   uint32_t eip, cs, eflags, useresp, ss; /* Pushed by the processor automatically */
 } registers_t;
 
 /**
@@ -99,14 +101,14 @@ typedef void (*isr_handler_ptr_t)(registers_t);
  * @param[in]  int_num  The interrupt number
  * @param[in]  handler  Pointer to a function to call to handle the interrupt
  */
-void register_interrupt_handler(unsigned char int_num, isr_handler_ptr_t handler);
+void register_interrupt_handler(uint8_t int_num, isr_handler_ptr_t handler);
 
 /**
  * @brief      Unregisters the interrupt handler
  *
  * @param[in]  int_num  The interrupt number
  */
-void unregister_interrupt_handler(unsigned char int_num);
+void unregister_interrupt_handler(uint8_t int_num);
 
 #define MASTER_PIC_COMMAND		(0x20)
 #define MASTER_PIC_DATA			(0x21)

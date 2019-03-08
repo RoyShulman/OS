@@ -4,7 +4,7 @@
 #include "IO.h"
 
 void print_char(char character, int col, int row, char attribute_byte) {
-	unsigned char* vidmem = (unsigned char*) VIDEO_ADDRESS;
+	uint8_t* vidmem = (uint8_t*) VIDEO_ADDRESS;
 
 	if (!attribute_byte) {
 		attribute_byte = WHITE_ON_BLACK;
@@ -48,14 +48,14 @@ int get_cursor() {
 	// The screen device uses the control register to know what query we want to perform 
 	// and sets the data in the data register. 14 - cursor high byte, 15 - cursor low byte
 	
-	unsigned char cursor_high_byte_query = 14;
-	unsigned char cursor_low_byte_query = 15;
+	uint8_t cursor_high_byte_query = 14;
+	uint8_t cursor_low_byte_query = 15;
 	
 	port_byte_out(REG_SCREEN_CTRL, cursor_high_byte_query);
-	unsigned char cursor_high_byte = port_byte_in(REG_SCREEN_DATA) ;
+	uint8_t cursor_high_byte = port_byte_in(REG_SCREEN_DATA) ;
 
 	port_byte_out(REG_SCREEN_CTRL, cursor_low_byte_query);
-	unsigned char cursor_low_byte = port_byte_in(REG_SCREEN_DATA);
+	uint8_t cursor_low_byte = port_byte_in(REG_SCREEN_DATA);
 
 	int offset = (cursor_high_byte << 8) + cursor_low_byte;
 
@@ -74,11 +74,11 @@ void set_cursor(const int cell_offset) {
 	int cell_size = 2;
 	const int char_offset = cell_offset / cell_size;
 
-	unsigned char cursor_high_byte = (char_offset >> 8) & 0xff;
-	unsigned char cursor_low_byte = char_offset & 0xff;
+	uint8_t cursor_high_byte = (char_offset >> 8) & 0xff;
+	uint8_t cursor_low_byte = char_offset & 0xff;
 
-	unsigned char cursor_high_byte_query = 14;
-	unsigned char cursor_low_byte_query = 15;
+	uint8_t cursor_high_byte_query = 14;
+	uint8_t cursor_low_byte_query = 15;
 
 	port_byte_out(REG_SCREEN_CTRL, cursor_high_byte_query);
 	port_byte_out(REG_SCREEN_DATA, cursor_high_byte);
@@ -94,7 +94,7 @@ void print_at(const char* message, const int col, const int row) {
 	}
 
 	// Loop through the string and print it
-	unsigned int i = 0;
+	uint32_t i = 0;
 	while (message[i] != 0) {
 		print_char(message[i], col, row, WHITE_ON_BLACK);
 		++i;
@@ -107,8 +107,8 @@ void print(const char* message) {
 
 void clear_screen() {
 	// Loop through the screen and set it's byte to ' '
-	for (unsigned int row = 0; row < MAX_ROWS; row++) {
-		for (unsigned int col = 0; col < MAX_COLS; col++) {
+	for (uint32_t row = 0; row < MAX_ROWS; row++) {
+		for (uint32_t col = 0; col < MAX_COLS; col++) {
 			print_char(' ', col, row, WHITE_ON_BLACK);
 		}
 	}

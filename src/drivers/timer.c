@@ -1,4 +1,6 @@
 #include "IO.h"
+#include <stdint.h>
+
 #include "screen.h"
 #include "../kernel/isr.h"
 #include "../kernel/utils.h"
@@ -6,7 +8,7 @@
 #include "timer.h"
 
 // 32 bit tick counter
-unsigned int tick = 0;
+uint32_t tick = 0;
 
 /**
  * @brief      Interrupt handler for timer interrupt

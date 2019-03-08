@@ -1,3 +1,5 @@
+#include <stdint.h>
+
 #include "IO.h"
 #include "screen.h"
 #include "../kernel/isr.h"
@@ -11,9 +13,9 @@
  * @param[in]  		scancode     The scancode
  * @param[out]      return_char  The return character
  */
-static void scancode_to_char(unsigned char scancode, char** return_char) {
-	unsigned char press_release_difference = 0x80;
-	unsigned char known_scancodes = 0x44; 	// This is also the number of cases + 1
+static void scancode_to_char(uint8_t scancode, char** return_char) {
+	uint8_t press_release_difference = 0x80;
+	uint8_t known_scancodes = 0x44; 	// This is also the number of cases + 1
 	switch(scancode) {
 		case 0x01:
 			*return_char = "ESC";
@@ -237,7 +239,7 @@ static void scancode_to_char(unsigned char scancode, char** return_char) {
 static void keyboard_callback(registers_t r) {
 	UNUSED(r);
 
-	unsigned char scancode;
+	uint8_t scancode;
 	scancode = port_byte_in(KEYBOARD_PORT);
 
 	char* input_char = { 0 };

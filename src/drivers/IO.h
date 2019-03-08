@@ -1,6 +1,8 @@
 #ifndef IO_H
 #define IO_H
 
+#include <stdint.h>
+
 /**
  * Wrapper functions for hardware input output operations
  */
@@ -13,7 +15,7 @@
  *
  * @return     The byte read from the specified port
  */
-unsigned char port_byte_in(unsigned short port);
+uint8_t port_byte_in(uint16_t port);
 
 /**
  * @brief      Wrapper function to write a byte to a specified port
@@ -21,7 +23,7 @@ unsigned char port_byte_in(unsigned short port);
  * @param[in]  port  The port to write into
  * @param[in]  data  The byte to write into the port
  */
-void port_byte_out(unsigned short port, unsigned char data);
+void port_byte_out(uint16_t port, uint8_t data);
 
 /**
  * @brief      A wrapper function that reads a word from a specific port
@@ -30,7 +32,7 @@ void port_byte_out(unsigned short port, unsigned char data);
  *
  * @return     The word read from the specific port
  */
-unsigned short port_word_in(unsigned short port);
+uint16_t port_word_in(uint16_t port);
 
 /**
  * @brief      A wrapper function to write a word to a specified port
@@ -38,6 +40,6 @@ unsigned short port_word_in(unsigned short port);
  * @param[in]  port  The port to write into
  * @param[in]  data  The data to write into the port
  */
-void port_word_out(unsigned short port, unsigned short data);
+void port_word_out(uint16_t port, uint16_t data);
 
 #endif

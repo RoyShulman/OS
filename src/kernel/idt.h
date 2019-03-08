@@ -1,27 +1,29 @@
 #ifndef IDT_H
 #define IDT_H
 
+#include <stdint.h>
+
 #define GDT_KERNEL_CODE_SEG (0x8)
 
 typedef struct {
-    unsigned short low_offset;  // offset bits 0-15 of entry point of ISR
-    unsigned short selector;    // code segment descriptor in gdt
-    unsigned char zero;         // unused
-    unsigned char attributes;    
+    uint16_t low_offset;  // offset bits 0-15 of entry point of ISR
+    uint16_t selector;    // code segment descriptor in gdt
+    uint8_t zero;         // unused
+    uint8_t attributes;    
     /*
      * Bit 7:       Interrupt present
      * Bits 6-5:    Privilege level of caller
      * bit 4:       Set to 0 for interrupt gate
      * Bit 3-0:     1110 - 32 bit interrupt gate
      */
-    unsigned short high_offset;  // offset bits 16-31 of entry point of ISR
+    uint16_t high_offset;  // offset bits 16-31 of entry point of ISR
 } __attribute__((packed)) idt_gate_t;
 
 // Pointer to the array of interrupt descriptors
 // Load with lidt
 typedef struct {
-    unsigned short limit;
-    unsigned int base;
+    uint16_t limit;
+    uint32_t base;
 } __attribute__((packed)) idt_register_t;
 
 #define IDT_ENTRIES (256)
@@ -39,6 +41,6 @@ void set_idt();
  * @param[in]  index     The index of interrupt
  * @param[in]  offset    The offset of the isr
  */
-void set_idt_gate(int num, unsigned int offset);
+void set_idt_gate(int num, uint32_t offset);
 
 #endif
