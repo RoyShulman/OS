@@ -10,6 +10,6 @@ void main() {
 	isr_install();
 	__asm__ __volatile__ ("sti");
 
-	init_timer(100);
+	init_timer(200);
 	init_keyboard();
 }
