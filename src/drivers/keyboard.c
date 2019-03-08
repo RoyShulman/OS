@@ -12,7 +12,8 @@
  * @param[out]      return_char  The return character
  */
 static void scancode_to_char(unsigned char scancode, char** return_char) {
-	UNUSED(return_char);
+	unsigned char press_release_difference = 0x80;
+	unsigned char known_scancodes = 0x44; 	// This is also the number of cases + 1
 	switch(scancode) {
 		case 0x01:
 			*return_char = "ESC";
@@ -137,7 +138,92 @@ static void scancode_to_char(unsigned char scancode, char** return_char) {
 		case 0x29:
 			*return_char = "`";
 			break;
+		case 0x2a:
+			*return_char = "LSHIFT";
+			break;
+		case 0x2b:
+			*return_char = "\\";
+			break;
+		case 0x2c:
+			*return_char = "z";
+			break;
+		case 0x2d:
+			*return_char = "x";
+			break;
+		case 0x2e:
+			*return_char = "c";
+			break;
+		case 0x2f:
+			*return_char = "v";
+			break;
+		case 0x30:
+			*return_char = "b";
+			break;
+		case 0x31:
+			*return_char = "n";
+			break;
+		case 0x32:
+			*return_char = "m";
+			break;
+		case 0x33:
+			*return_char = ",";
+			break;
+		case 0x34:
+			*return_char = ".";
+			break;
+		case 0x35:
+			*return_char = "/";
+			break;
+		case 0x36:
+			*return_char = "RSHIFT";
+			break;
+		case 0x37:
+			*return_char = "*";
+			break;
+		case 0x38:
+			*return_char = "LALT";
+			break;
+		case 0x39:
+			*return_char = "SPACE";
+			break;
+		case 0x3a:
+			*return_char = "CAPSLOCK";
+			break;
+		case 0x3b:
+			*return_char = "F1";
+			break;
+		case 0x3c:
+			*return_char = "F2";
+			break;
+		case 0x3d:
+			*return_char = "F3";
+			break;
+		case 0x3e:
+			*return_char = "F4";
+			break;
+		case 0x3f:
+			*return_char = "F5";
+			break;
+		case 0x40:
+			*return_char = "F6";
+			break;
+		case 0x41:
+			*return_char = "F7";
+			break;
+		case 0x42:
+			*return_char = "F8";
+			break;
+		case 0x43:
+			*return_char = "F9";
+			break;
+		case 0x44:
+			*return_char = "F10";
+			break;
 		default:
+			if (scancode <= known_scancodes + press_release_difference) {
+				scancode_to_char(scancode - press_release_difference, return_char);
+				break;
+			}
 			*return_char = "?";
 			break;
 	}
