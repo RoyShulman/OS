@@ -17,11 +17,13 @@ static void timer_callback(registers_t r) {
 	UNUSED(r);
 
 	tick++;
-	print("Got tick: ");
-	char tick_ascii[256];
-	itoa(tick, tick_ascii);
-	print(tick_ascii);
-	print("\n");
+	if (tick % 100 == 0) {
+		print("Got tick: ");
+		char tick_ascii[256];
+		itoa(tick, tick_ascii);
+		print(tick_ascii);
+		print("\n");
+	}
 }
 
 void set_frequency(int frequency) {
