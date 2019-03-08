@@ -8,6 +8,8 @@
 // To surpress unused veriable error
 #define UNUSED(x) (void)(x)
 
+#define NULL 	(0)
+
 /**
  * @brief      Helper functiont to copy num_bytes from one buffer to the other
  *
