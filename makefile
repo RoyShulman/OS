@@ -1,16 +1,17 @@
-BOOTDIR=./src/boot
+workspaceDir=$(CURDIR)
+BOOTDIR=$(workspaceDir)/src/boot
 CC=gcc
 LD=ld
-CFLAGS=-Werror -g -Wextra -Wall -pedantic -std=c11 -m32 -ffreestanding
+CFLAGS=-nostdlib -Werror -g -Wextra -Wall -pedantic -std=c11 -m32 -ffreestanding -I$(workspaceDir)/src/
 LDFLAGS=--oformat binary -Ttext 0x1000 -m elf_i386
-SOURCES=$(shell find . -name "*.c")
-ASM_SOURCES=$(shell find . -name "*.asm" -not -path "./src/boot/*")
-HEADERS=$(shell find . -name "*.h")
+SOURCES=$(shell find $(workspaceDir) -name "*.c")
+ASM_SOURCES=$(shell find $(workspaceDir) -name "*.asm" -not -path "$(workspaceDir)/src/boot/*")
+HEADERS=$(shell find $(workspaceDir) -name "*.h")
 OBJECTS=$(SOURCES:%.c=%.o)
 OBJECTS+=$(ASM_SOURCES:%.asm=%.o)
-TARGET_DIR=./src/bin
+TARGET_DIR=$(workspaceDir)/src/bin
 TARGET=kernel.bin
-KERNEL_SOURCE=./src/kernel
+KERNEL_SOURCE=$(workspaceDir)/src/kernel
 GDB=gdb
 
 .PHONY: run
@@ -20,11 +21,12 @@ run: os_image
 .PHONY: all
 all: os_image
 
+.PHONY: debug
 debug: os_image kernel.elf
 	qemu-system-x86_64 -s $(TARGET_DIR)/$< &
-	$(GDB) -ex "target remote localhost:1234" -ex "symbol-file ./src/bin/kernel.elf"
+	$(GDB) -ex "target remote localhost:1234" -ex "symbol-file $(workspaceDir)/src/bin/kernel.elf"
 
-kernel.elf: $(KERNEL_SOURCE)/kernel_entry.o $(OBJECTS)
+kernel.elf:  $(OBJECTS)
 	$(LD) -o $(TARGET_DIR)/$@ -Ttext 0x1000 -m elf_i386 $^
 
 os_image: bootsector.bin kernel.bin
@@ -52,9 +54,6 @@ setup:
 clean:
 	rm -rf $(TARGET_DIR) $(shell find ./src -name "*.o")
 
-.PHONY: run
-run:
-	qemu-system-x86_64 $(TARGET_DIR)/os_image
 
 .PHONY: rebuild
 rebuild: | clean all

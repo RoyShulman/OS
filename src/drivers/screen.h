@@ -77,4 +77,11 @@ int get_screen_offset(const int col, const int row);
  */
 int handle_scrolling(const int curser_offset);
 
+/**
+ * @brief      Wrapper function to print an integer
+ *
+ * @param[in]  num   The integer to print
+ */
+void print_itoa(int num);
+
 #endif

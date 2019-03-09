@@ -1,12 +1,20 @@
 #include "utils.h"
 
-void copy_memory(char* source, char* dest, int num_bytes) {
+void memcpy(char* source, char* dest, int num_bytes) {
+	if (source == NULL || dest == NULL)	{
+		return;
+	}
+
 	for (int i = 0; i < num_bytes; i++) {
 		*(dest + i) = *(source + i);
 	}
 }
 
 void itoa(int num, char* str) {
+	if (str == NULL) {
+		return;
+	}
+
 	int i = 0;
 	char is_negative = 0;
 
@@ -41,6 +49,9 @@ void itoa(int num, char* str) {
 }
 
 void reverse(char* string) {
+	if (string == NULL) {
+		return;
+	}
 	int len = strlen(string);
 	for (int i = 0; i < (len / 2); i++) {
 		char temp;
@@ -51,6 +62,9 @@ void reverse(char* string) {
 }
 
 int strlen(char* string) {
+	if (string == NULL) {
+		return -1;
+	}
 	int len = 0;
 	int i = 0;
 	while(string[i++] != 0) {

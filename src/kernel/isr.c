@@ -1,9 +1,12 @@
+#include <drivers/screen.h>
+#include <drivers/IO.h>
+
 #include "idt.h"
 #include "utils.h"
-#include "../drivers/screen.h"
-#include "../drivers/IO.h"
 
 #include "isr.h"
+
+#define create_idt_gate(x)     set_idt_gate(x, (uint32_t)isr(x))
 
 isr_handler_ptr_t interrupt_handlers[256];
 

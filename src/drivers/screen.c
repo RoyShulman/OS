@@ -1,10 +1,17 @@
-#include "screen.h"
-#include "../kernel/utils.h"
+#include <kernel/utils.h>
 
 #include "IO.h"
 
+#include "screen.h"
+
+#define CELL_SIZE 	(2)
+
 void print_char(char character, int col, int row, char attribute_byte) {
 	uint8_t* vidmem = (uint8_t*) VIDEO_ADDRESS;
+
+	if (vidmem == NULL) {
+		return;
+	}
 
 	if (!attribute_byte) {
 		attribute_byte = WHITE_ON_BLACK;
@@ -61,8 +68,7 @@ int get_cursor() {
 
 	// The cursor offset we got from the VGA hardware is the number of characters we
 	// need to multiply it by 2 to convert it to a cell offset(each cell has the char and the style)
-	int cell_size = 2;
-	offset *= cell_size;
+	offset *= CELL_SIZE;
 
 	return offset;
 }
@@ -71,8 +77,7 @@ void set_cursor(const int cell_offset) {
 	// Because each cell in the VGA is of size 2 we need to devide our offset by 2
 	// to convert to char offset from cell offset
 	
-	int cell_size = 2;
-	const int char_offset = cell_offset / cell_size;
+	const int char_offset = cell_offset / CELL_SIZE;
 
 	uint8_t cursor_high_byte = (char_offset >> 8) & 0xff;
 	uint8_t cursor_low_byte = char_offset & 0xff;
@@ -117,14 +122,12 @@ void clear_screen() {
 }
 
 int get_screen_offset(const int col, const int row) {
-	// To calculate we use ((row * MAX_COL) + col) * cell_size
-	int cell_size = 2;
-	return (((row * MAX_COLS) + col) * cell_size);
+	// To calculate we use ((row * MAX_COL) + col) * CELL_SIZE
+	return (((row * MAX_COLS) + col) * CELL_SIZE);
 }
 
 int handle_scrolling(const int curser_offset) {
-	int cell_size = 2;
-	int vga_buffer_size = MAX_ROWS * MAX_COLS * cell_size;
+	int vga_buffer_size = MAX_ROWS * MAX_COLS * CELL_SIZE;
 	// If offset is inside the vga, return the offset unmodified
 	if (curser_offset < vga_buffer_size) {
 		return curser_offset;
@@ -132,17 +135,23 @@ int handle_scrolling(const int curser_offset) {
 
 	// Shift rows back one, starting from index 1
 	for (int i = 1; i < MAX_ROWS; i++) {
-		copy_memory((char*) (get_screen_offset(0, i) + VIDEO_ADDRESS),
+		memcpy((char*) (get_screen_offset(0, i) + VIDEO_ADDRESS),
 					(char*) (get_screen_offset(0, i -1) + VIDEO_ADDRESS),
-					MAX_COLS * cell_size);
+					MAX_COLS * CELL_SIZE);
 		// Blank the last line
 	}
 	char* last_line = (char*) (get_screen_offset(0, MAX_ROWS - 1) + VIDEO_ADDRESS);
-	for (int i = 0; i < MAX_COLS * cell_size; i++) {
+	for (int i = 0; i < MAX_COLS * CELL_SIZE; i++) {
 		last_line[i] = 0;
 	}
 	// Set the curser to be on the last row, rather than the edge of the screen
 	int new_curser_offset = curser_offset - 2 * MAX_COLS;
 
 	return new_curser_offset;
+}
+
+void print_itoa(int num) {
+	char num_ascii[256];
+	itoa(num, num_ascii);
+	print(num_ascii);
 }

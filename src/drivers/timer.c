@@ -1,11 +1,16 @@
-#include "IO.h"
-#include <stdint.h>
+#include <kernel/types.h>
+#include <kernel/isr.h>
+#include <kernel/utils.h>
 
+#include "IO.h"
 #include "screen.h"
-#include "../kernel/isr.h"
-#include "../kernel/utils.h"
 
 #include "timer.h"
+
+#define CLOCK_FREQUENCY (1193180) 	//Hz units
+#define TIMER_COMMAND_PORT (0x43)
+#define TIMER_CHANNEL_PORT (0x40)
+
 
 // 32 bit tick counter
 uint32_t tick = 0;
@@ -21,9 +26,7 @@ static void timer_callback(registers_t r) {
 	tick++;
 	if (tick % 100 == 0) {
 		print("Got tick: ");
-		char tick_ascii[256];
-		itoa(tick, tick_ascii);
-		print(tick_ascii);
+		print_itoa(tick);
 		print("\n");
 	}
 }

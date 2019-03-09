@@ -1,11 +1,13 @@
-#include <stdint.h>
+#include <kernel/types.h>
+#include <kernel/isr.h>
+#include <kernel/utils.h>
 
 #include "IO.h"
 #include "screen.h"
-#include "../kernel/isr.h"
-#include "../kernel/utils.h"
 
 #include "keyboard.h"
+
+#define KEYBOARD_PORT	(0x60)
 
 /**
  * @brief      Translate a scan code to a it's meaning

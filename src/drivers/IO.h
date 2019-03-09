@@ -1,7 +1,7 @@
 #ifndef IO_H
 #define IO_H
 
-#include <stdint.h>
+#include <kernel/types.h>
 
 /**
  * Wrapper functions for hardware input output operations

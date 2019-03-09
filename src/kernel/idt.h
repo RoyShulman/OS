@@ -1,9 +1,7 @@
 #ifndef IDT_H
 #define IDT_H
 
-#include <stdint.h>
-
-#define GDT_KERNEL_CODE_SEG (0x8)
+#include "types.h"
 
 typedef struct {
     uint16_t low_offset;  // offset bits 0-15 of entry point of ISR

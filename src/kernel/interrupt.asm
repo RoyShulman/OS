@@ -2,6 +2,50 @@
 [extern isr_handler]
 [extern irq_handler]
 
+%macro  create_isr_handler  1
+   
+isr%1:     
+        cli
+        push byte %1
+        jmp isr_common_stub
+
+%endmacro
+
+%macro  create_isr_handler_dummy_error_code 1
+
+isr%1:
+        cli
+        push byte 0
+        push byte %1
+        jmp isr_common_stub
+
+%endmacro
+
+%macro  create_irq_handler  1
+
+irq%1:
+    cli
+    push byte %1
+    push byte (32 + %1)
+    jmp irq_common_stub
+
+%endmacro
+
+; Maybe I went a little too far with the macros...
+%macro loop_create_irq_handlers 1
+
+%assign i %1
+%rep    i+1
+
+    create_irq_handler i
+
+%assign i i-1
+%endrep
+
+
+%endmacro
+
+
 ; Common ISR code
 isr_common_stub:
     ; 1. Save CPU state
@@ -110,316 +154,132 @@ global irq14
 global irq15
 
 ; 0: Divide By Zero Exception
-isr0:
-    cli
-    push byte 0
-    push byte 0
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 0
 
 ; 1: Debug Exception
-isr1:
-    cli
-    push byte 0
-    push byte 1
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 1
 
 ; 2: Non Maskable Interrupt Exception
-isr2:
-    cli
-    push byte 0
-    push byte 2
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 2
 
 ; 3: Int 3 Exception
-isr3:
-    cli
-    push byte 0
-    push byte 3
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 3
 
 ; 4: INTO Exception
-isr4:
-    cli
-    push byte 0
-    push byte 4
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 4
 
 ; 5: Out of Bounds Exception
-isr5:
-    cli
-    push byte 0
-    push byte 5
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 5
 
 ; 6: Invalid Opcode Exception
-isr6:
-    cli
-    push byte 0
-    push byte 6
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 6
 
 ; 7: Coprocessor Not Available Exception
-isr7:
-    cli
-    push byte 0
-    push byte 7
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 7
 
 ; 8: Double Fault Exception (With Error Code!)
-isr8:
-    cli
-    push byte 8
-    jmp isr_common_stub
+create_isr_handler 8
 
 ; 9: Coprocessor Segment Overrun Exception
-isr9:
-    cli
-    push byte 0
-    push byte 9
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 9
 
 ; 10: Bad TSS Exception (With Error Code!)
-isr10:
-    cli
-    push byte 10
-    jmp isr_common_stub
+create_isr_handler 10
 
 ; 11: Segment Not Present Exception (With Error Code!)
-isr11:
-    cli
-    push byte 11
-    jmp isr_common_stub
+create_isr_handler 11
 
 ; 12: Stack Fault Exception (With Error Code!)
-isr12:
-    cli
-    push byte 12
-    jmp isr_common_stub
+create_isr_handler 12
 
 ; 13: General Protection Fault Exception (With Error Code!)
-isr13:
-    cli
-    push byte 13
-    jmp isr_common_stub
+create_isr_handler 13
 
 ; 14: Page Fault Exception (With Error Code!)
-isr14:
-    cli
-    push byte 14
-    jmp isr_common_stub
+create_isr_handler 14
 
 ; 15: Reserved Exception
-isr15:
-    cli
-    push byte 0
-    push byte 15
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 15
 
 ; 16: Floating Point Exception
-isr16:
-    cli
-    push byte 0
-    push byte 16
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 16
 
 ; 17: Alignment Check Exception
-isr17:
-    cli
-    push byte 0
-    push byte 17
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 17
 
 ; 18: Machine Check Exception
-isr18:
-    cli
-    push byte 0
-    push byte 18
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 18
 
 ; 19: Reserved
-isr19:
-    cli
-    push byte 0
-    push byte 19
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 19
 
 ; 20: Reserved
-isr20:
-    cli
-    push byte 0
-    push byte 20
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 20
 
 ; 21: Reserved
-isr21:
-    cli
-    push byte 0
-    push byte 21
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 21
 
 ; 22: Reserved
-isr22:
-    cli
-    push byte 0
-    push byte 22
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 22
 
 ; 23: Reserved
-isr23:
-    cli
-    push byte 0
-    push byte 23
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 23
 
 ; 24: Reserved
-isr24:
-    cli
-    push byte 0
-    push byte 24
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 24
 
 ; 25: Reserved
-isr25:
-    cli
-    push byte 0
-    push byte 25
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 25
 
 ; 26: Reserved
-isr26:
-    cli
-    push byte 0
-    push byte 26
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 26
 
 ; 27: Reserved
-isr27:
-    cli
-    push byte 0
-    push byte 27
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 27
 
 ; 28: Reserved
-isr28:
-    cli
-    push byte 0
-    push byte 28
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 28
 
 ; 29: Reserved
-isr29:
-    cli
-    push byte 0
-    push byte 29
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 29
 
 ; 30: Reserved
-isr30:
-    cli
-    push byte 0
-    push byte 30
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 30
 
 ; 31: Reserved
-isr31:
-    cli
-    push byte 0
-    push byte 31
-    jmp isr_common_stub
+create_isr_handler_dummy_error_code 31
 
 ; IRQ handlers
-irq0:
-    cli
-    push byte 0
-    push byte 32
-    jmp irq_common_stub
+; create_irq_handler 0
 
-irq1:
-    cli
-    push byte 1
-    push byte 33
-    jmp irq_common_stub
+; create_irq_handler 1
 
-irq2:
-    cli
-    push byte 2
-    push byte 34
-    jmp irq_common_stub
+; create_irq_handler 2
 
-irq3:
-    cli
-    push byte 3
-    push byte 35
-    jmp irq_common_stub
+; create_irq_handler 3
 
-irq4:
-    cli
-    push byte 4
-    push byte 36
-    jmp irq_common_stub
+; create_irq_handler 4
 
-irq5:
-    cli
-    push byte 5
-    push byte 37
-    jmp irq_common_stub
+; create_irq_handler 5
 
-irq6:
-    cli
-    push byte 6
-    push byte 38
-    jmp irq_common_stub
+; create_irq_handler 6
 
-irq7:
-    cli
-    push byte 7
-    push byte 39
-    jmp irq_common_stub
+; create_irq_handler 7
 
-irq8:
-    cli
-    push byte 8
-    push byte 40
-    jmp irq_common_stub
+; create_irq_handler 8
 
-irq9:
-    cli
-    push byte 9
-    push byte 41
-    jmp irq_common_stub
+; create_irq_handler 9
 
-irq10:
-    cli
-    push byte 10
-    push byte 42
-    jmp irq_common_stub
+; create_irq_handler 10
 
-irq11:
-    cli
-    push byte 11
-    push byte 43
-    jmp irq_common_stub
+; create_irq_handler 11
 
-irq12:
-    cli
-    push byte 12
-    push byte 44
-    jmp irq_common_stub
+; create_irq_handler 12
 
-irq13:
-    cli
-    push byte 13
-    push byte 45
-    jmp irq_common_stub
+; create_irq_handler 13
 
-irq14:
-    cli
-    push byte 14
-    push byte 46
-    jmp irq_common_stub
+; create_irq_handler 14
 
-irq15:
-    cli
-    push byte 15
-    push byte 47
-    jmp irq_common_stub
+; create_irq_handler 15
+
+loop_create_irq_handlers 15
