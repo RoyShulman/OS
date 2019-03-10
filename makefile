@@ -2,7 +2,7 @@ workspaceDir=$(CURDIR)
 BOOTDIR=$(workspaceDir)/src/boot
 CC=gcc
 LD=ld
-CFLAGS=-nostdlib -Werror -g -Wextra -Wall -pedantic -std=c11 -m32 -ffreestanding -I$(workspaceDir)/src/
+CFLAGS=-nostdlib -Werror -g -Wextra -Wall -pedantic -std=c11 -m32 -ffreestanding -I$(workspaceDir)/src/ -funroll-all-loops
 LDFLAGS=--oformat binary -Ttext 0x1000 -m elf_i386
 SOURCES=$(shell find $(workspaceDir) -name "*.c")
 ASM_SOURCES=$(shell find $(workspaceDir) -name "*.asm" -not -path "$(workspaceDir)/src/boot/*")

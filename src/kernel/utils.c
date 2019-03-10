@@ -1,18 +1,19 @@
 #include "utils.h"
 
-void memcpy(char* source, char* dest, int num_bytes) {
+int memcpy(char* source, char* dest, int num_bytes) {
 	if (source == NULL || dest == NULL)	{
-		return;
+		return -1;
 	}
 
 	for (int i = 0; i < num_bytes; i++) {
 		*(dest + i) = *(source + i);
 	}
+	return 0;
 }
 
-void itoa(int num, char* str) {
+int itoa(int num, char* str) {
 	if (str == NULL) {
-		return;
+		return -1;
 	}
 
 	int i = 0;
@@ -21,7 +22,7 @@ void itoa(int num, char* str) {
 	if (num == 0) {
 		str[i] = '0';
 		str[++i] = 0;
-		return;
+		return 0;
 	}
 
 	if (num < 0) {
@@ -43,14 +44,16 @@ void itoa(int num, char* str) {
 	// Add the null terminator
 	str[i] = 0;
 
-	reverse(str);
+	if (reverse(str) != 0) {
+		return -1;
+	}
 
-	return;
+	return 0;
 }
 
-void reverse(char* string) {
+int reverse(char* string) {
 	if (string == NULL) {
-		return;
+		return -1;
 	}
 	int len = strlen(string);
 	for (int i = 0; i < (len / 2); i++) {
@@ -59,6 +62,7 @@ void reverse(char* string) {
 		string[i] = string[len - i - 1];
 		string[len - 1 - i] = temp;
 	}
+	return 0;
 }
 
 int strlen(char* string) {

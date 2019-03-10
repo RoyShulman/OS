@@ -135,9 +135,11 @@ int handle_scrolling(const int curser_offset) {
 
 	// Shift rows back one, starting from index 1
 	for (int i = 1; i < MAX_ROWS; i++) {
-		memcpy((char*) (get_screen_offset(0, i) + VIDEO_ADDRESS),
+		if (memcpy((char*) (get_screen_offset(0, i) + VIDEO_ADDRESS),
 					(char*) (get_screen_offset(0, i -1) + VIDEO_ADDRESS),
-					MAX_COLS * CELL_SIZE);
+					MAX_COLS * CELL_SIZE) != 0) {
+			print("memcpy failed in handle_scrolling\n");
+		}
 		// Blank the last line
 	}
 	char* last_line = (char*) (get_screen_offset(0, MAX_ROWS - 1) + VIDEO_ADDRESS);
@@ -152,6 +154,9 @@ int handle_scrolling(const int curser_offset) {
 
 void print_itoa(int num) {
 	char num_ascii[256];
-	itoa(num, num_ascii);
+	if (itoa(num, num_ascii) != 0){
+		print("Could not convert digit to ascii!\n");
+		return;
+	}
 	print(num_ascii);
 }

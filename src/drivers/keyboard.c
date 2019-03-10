@@ -12,10 +12,15 @@
 /**
  * @brief      Translate a scan code to a it's meaning
  *
- * @param[in]  		scancode     The scancode
- * @param[out]      return_char  The return character
+ * @param[in]  scancode     The scancode
+ * @param[out] return_char  The return character
+ *
+ * @return     Returns 0 on sucess, -1 on error
  */
-static void scancode_to_char(uint8_t scancode, char** return_char) {
+static int scancode_to_char(uint8_t scancode, char** return_char) {
+	if(return_char == NULL) {
+		return -1;
+	}
 	uint8_t press_release_difference = 0x80;
 	uint8_t known_scancodes = 0x44; 	// This is also the number of cases + 1
 	switch(scancode) {
@@ -231,6 +236,7 @@ static void scancode_to_char(uint8_t scancode, char** return_char) {
 			*return_char = "?";
 			break;
 	}
+	return 0;
 }
 
 /**
@@ -244,11 +250,15 @@ static void keyboard_callback(registers_t r) {
 	uint8_t scancode;
 	scancode = port_byte_in(KEYBOARD_PORT);
 
-	char* input_char = { 0 };
-	scancode_to_char(scancode, &input_char);
-	print("Input char was: ");
-	print(input_char);
-	print("\n");
+	char* input_char = NULL;
+	if (scancode_to_char(scancode, &input_char) != 0) {
+		print("Could not translate input scan code to char!\n")
+	}
+	else {
+		print("Input char was: ");
+		print(input_char);
+		print("\n");		
+	}
 }
 
 
