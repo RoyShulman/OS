@@ -6,7 +6,7 @@
 
 #include "isr.h"
 
-#define create_idt_gate(x)     set_idt_gate(x, (uint32_t)isr(x))
+#define NUM_INTERRUPT_HANDLERS      (47)
 
 isr_handler_ptr_t interrupt_handlers[256];
 
@@ -15,58 +15,77 @@ isr_handler_ptr_t interrupt_handlers[256];
  * of the function names */
 void isr_install() {
 
-    set_idt_gate(0, (uint32_t)isr0);
-    set_idt_gate(1, (uint32_t)isr1);
-    set_idt_gate(2, (uint32_t)isr2);
-    set_idt_gate(3, (uint32_t)isr3);
-    set_idt_gate(4, (uint32_t)isr4);
-    set_idt_gate(5, (uint32_t)isr5);
-    set_idt_gate(6, (uint32_t)isr6);
-    set_idt_gate(7, (uint32_t)isr7);
-    set_idt_gate(8, (uint32_t)isr8);
-    set_idt_gate(9, (uint32_t)isr9);
-    set_idt_gate(10, (uint32_t)isr10);
-    set_idt_gate(11, (uint32_t)isr11);
-    set_idt_gate(12, (uint32_t)isr12);
-    set_idt_gate(13, (uint32_t)isr13);
-    set_idt_gate(14, (uint32_t)isr14);
-    set_idt_gate(15, (uint32_t)isr15);
-    set_idt_gate(16, (uint32_t)isr16);
-    set_idt_gate(17, (uint32_t)isr17);
-    set_idt_gate(18, (uint32_t)isr18);
-    set_idt_gate(19, (uint32_t)isr19);
-    set_idt_gate(20, (uint32_t)isr20);
-    set_idt_gate(21, (uint32_t)isr21);
-    set_idt_gate(22, (uint32_t)isr22);
-    set_idt_gate(23, (uint32_t)isr23);
-    set_idt_gate(24, (uint32_t)isr24);
-    set_idt_gate(25, (uint32_t)isr25);
-    set_idt_gate(26, (uint32_t)isr26);
-    set_idt_gate(27, (uint32_t)isr27);
-    set_idt_gate(28, (uint32_t)isr28);
-    set_idt_gate(29, (uint32_t)isr29);
-    set_idt_gate(30, (uint32_t)isr30);
-    set_idt_gate(31, (uint32_t)isr31);
+    // Array of function pointers to interrupt handlers
+    void (*handler_ptrs[48])() = {  isr0, isr1, isr2, isr3, isr4, 
+                                    isr5, isr6, isr7, isr8, isr9,  
+                                    isr10, isr11, isr12, isr13, isr14,
+                                    isr15, isr16, isr17, isr18, isr19,
+                                    isr20, isr21, isr22, isr23, isr24, 
+                                    isr25, isr26, isr27, isr28, isr29,  
+                                    isr30, isr31, irq0, irq1, irq2,
+                                    irq3, irq4, irq5, irq6, irq7, irq8,
+                                    irq9, irq10, irq11, irq12, irq13,
+                                    irq14, irq15
+                                };
 
     remap_irq();
 
-     // Install the IRQs
-    set_idt_gate(32, (uint32_t)irq0);
-    set_idt_gate(33, (uint32_t)irq1);
-    set_idt_gate(34, (uint32_t)irq2);
-    set_idt_gate(35, (uint32_t)irq3);
-    set_idt_gate(36, (uint32_t)irq4);
-    set_idt_gate(37, (uint32_t)irq5);
-    set_idt_gate(38, (uint32_t)irq6);
-    set_idt_gate(39, (uint32_t)irq7);
-    set_idt_gate(40, (uint32_t)irq8);
-    set_idt_gate(41, (uint32_t)irq9);
-    set_idt_gate(42, (uint32_t)irq10);
-    set_idt_gate(43, (uint32_t)irq11);
-    set_idt_gate(44, (uint32_t)irq12);
-    set_idt_gate(45, (uint32_t)irq13);
-    set_idt_gate(46, (uint32_t)irq14);
-    set_idt_gate(47, (uint32_t)irq15);
+    for (int i = 0; i <= NUM_INTERRUPT_HANDLERS; i++ ) {
+        set_idt_gate(i, (uint32_t)handler_ptrs[i]);
+    }
+
+    // set_idt_gate(0, (uint32_t)isr0);
+    // set_idt_gate(1, (uint32_t)isr1);
+    // set_idt_gate(2, (uint32_t)isr2);
+    // set_idt_gate(3, (uint32_t)isr3);
+    // set_idt_gate(4, (uint32_t)isr4);
+    // set_idt_gate(5, (uint32_t)isr5);
+    // set_idt_gate(6, (uint32_t)isr6);
+    // set_idt_gate(7, (uint32_t)isr7);
+    // set_idt_gate(8, (uint32_t)isr8);
+    // set_idt_gate(9, (uint32_t)isr9);
+    // set_idt_gate(10, (uint32_t)isr10);
+    // set_idt_gate(11, (uint32_t)isr11);
+    // set_idt_gate(12, (uint32_t)isr12);
+    // set_idt_gate(13, (uint32_t)isr13);
+    // set_idt_gate(14, (uint32_t)isr14);
+    // set_idt_gate(15, (uint32_t)isr15);
+    // set_idt_gate(16, (uint32_t)isr16);
+    // set_idt_gate(17, (uint32_t)isr17);
+    // set_idt_gate(18, (uint32_t)isr18);
+    // set_idt_gate(19, (uint32_t)isr19);
+    // set_idt_gate(20, (uint32_t)isr20);
+    // set_idt_gate(21, (uint32_t)isr21);
+    // set_idt_gate(22, (uint32_t)isr22);
+    // set_idt_gate(23, (uint32_t)isr23);
+    // set_idt_gate(24, (uint32_t)isr24);
+    // set_idt_gate(25, (uint32_t)isr25);
+    // set_idt_gate(26, (uint32_t)isr26);
+    // set_idt_gate(27, (uint32_t)isr27);
+    // set_idt_gate(28, (uint32_t)isr28);
+    // set_idt_gate(29, (uint32_t)isr29);
+    // set_idt_gate(30, (uint32_t)isr30);
+    // set_idt_gate(31, (uint32_t)isr31);
+
+    // remap_irq();
+
+    //  // Install the IRQs
+    // set_idt_gate(32, (uint32_t)irq0);
+    // set_idt_gate(33, (uint32_t)irq1);
+    // set_idt_gate(34, (uint32_t)irq2);
+    // set_idt_gate(35, (uint32_t)irq3);
+    // set_idt_gate(36, (uint32_t)irq4);
+    // set_idt_gate(37, (uint32_t)irq5);
+    // set_idt_gate(38, (uint32_t)irq6);
+    // set_idt_gate(39, (uint32_t)irq7);
+    // set_idt_gate(40, (uint32_t)irq8);
+    // set_idt_gate(41, (uint32_t)irq9);
+    // set_idt_gate(42, (uint32_t)irq10);
+    // set_idt_gate(43, (uint32_t)irq11);
+    // set_idt_gate(44, (uint32_t)irq12);
+    // set_idt_gate(45, (uint32_t)irq13);
+    // set_idt_gate(46, (uint32_t)irq14);
+    // set_idt_gate(47, (uint32_t)irq15);
 
     set_idt(); // Load with ASM
 }

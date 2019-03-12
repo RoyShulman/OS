@@ -252,7 +252,7 @@ static void keyboard_callback(registers_t r) {
 
 	char* input_char = NULL;
 	if (scancode_to_char(scancode, &input_char) != 0) {
-		print("Could not translate input scan code to char!\n")
+		print("Could not translate input scan code to char!\n");
 	}
 	else {
 		print("Input char was: ");
