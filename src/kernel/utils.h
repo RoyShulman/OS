@@ -17,9 +17,8 @@
  * @param[out] dest       The destination buffer to copy to
  * @param[in]  num_bytes  The number of bytes to copy
  *
- * @return     Returns 0 on sucess, -1 on error
  */
-int memcpy(char* source, char* dest, int num_bytes);
+void memcpy(char* source, char* dest, int num_bytes);
 
 /**
  * @brief      Convert an int to ascii

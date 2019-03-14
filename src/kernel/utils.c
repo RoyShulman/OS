@@ -1,14 +1,11 @@
 #include "utils.h"
 
-int memcpy(char* source, char* dest, int num_bytes) {
-	if (source == NULL || dest == NULL)	{
-		return -1;
-	}
+#define MAX_STR_LEN		(1500)
 
+void memcpy(char* source, char* dest, int num_bytes) {
 	for (int i = 0; i < num_bytes; i++) {
 		*(dest + i) = *(source + i);
 	}
-	return 0;
 }
 
 int itoa(int num, char* str) {
@@ -56,6 +53,9 @@ int reverse(char* string) {
 		return -1;
 	}
 	int len = strlen(string);
+	if (len > MAX_STR_LEN) {
+		return -1;
+	}
 	for (int i = 0; i < (len / 2); i++) {
 		char temp;
 		temp = string[i];

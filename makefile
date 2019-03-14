@@ -2,7 +2,7 @@ workspaceDir=$(CURDIR)
 BOOTDIR=$(workspaceDir)/src/boot
 CC=gcc
 LD=ld
-CFLAGS=-nostdlib -Werror -g -Wextra -Wall -pedantic -std=c11 -m32 -ffreestanding -I$(workspaceDir)/src/ -funroll-all-loops
+CFLAGS=-nostdlib -Werror -g -Wextra -Wall -pedantic -std=c11 -m32 -ffreestanding -I$(workspaceDir)/src/
 LDFLAGS=--oformat binary -Ttext 0x1000 -m elf_i386
 SOURCES=$(shell find $(workspaceDir) -name "*.c")
 ASM_SOURCES=$(shell find $(workspaceDir) -name "*.asm" -not -path "$(workspaceDir)/src/boot/*")
@@ -15,29 +15,29 @@ KERNEL_SOURCE=$(workspaceDir)/src/kernel
 GDB=gdb
 
 .PHONY: run
-run: os_image
-	qemu-system-x86_64 $(TARGET_DIR)/$<
+run: $(TARGET_DIR)/os_image
+	qemu-system-x86_64 $<
 
 .PHONY: all
-all: os_image
+all: $(TARGET_DIR)/os_image
 
 .PHONY: debug
-debug: os_image kernel.elf
-	qemu-system-x86_64 -s $(TARGET_DIR)/$< &
-	$(GDB) -ex "target remote localhost:1234" -ex "symbol-file $(workspaceDir)/src/bin/kernel.elf"
+debug: $(TARGET_DIR)/os_image $(TARGET_DIR)/kernel.elf
+	qemu-system-x86_64 -s $< &
+	$(GDB) -ex "target remote localhost:1234" -ex "symbol-file $(TARGET_DIR)/kernel.elf"
 
-kernel.elf:  $(OBJECTS)
-	$(LD) -o $(TARGET_DIR)/$@ -Ttext 0x1000 -m elf_i386 $^
+$(TARGET_DIR)/kernel.elf:  $(OBJECTS)
+	$(LD) -o $@ -Ttext 0x1000 -m elf_i386 $^
 
-os_image: bootsector.bin kernel.bin
-	cat $(TARGET_DIR)/bootsector.bin $(TARGET_DIR)/kernel.bin > $(TARGET_DIR)/os_image
+$(TARGET_DIR)/os_image: $(TARGET_DIR)/bootsector.bin $(TARGET_DIR)/$(TARGET)
+	cat $^ > $@
 
-%.bin: $(BOOTDIR)/%.asm
+$(TARGET_DIR)/%.bin: $(BOOTDIR)/%.asm
 		mkdir $(TARGET_DIR)
-		nasm $< -f bin -I $(BOOTDIR)/ -o $(TARGET_DIR)/$@
+		nasm $< -f bin -I $(BOOTDIR)/ -o $@
 
-$(TARGET): $(KERNEL_SOURCE)/kernel_entry.o $(OBJECTS) # The order here is important, We always want to have kernel_entry first 
-	$(LD) -o $(TARGET_DIR)/$@ $(LDFLAGS) $^ 	
+$(TARGET_DIR)/$(TARGET): $(KERNEL_SOURCE)/kernel_entry.o $(OBJECTS) # The order here is important, We always want to have kernel_entry first 
+	$(LD) -o $@ $(LDFLAGS) $^ 	
 
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c $< -o $@
