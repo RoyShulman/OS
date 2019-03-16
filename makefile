@@ -26,7 +26,7 @@ debug: $(TARGET_DIR)/os_image $(TARGET_DIR)/kernel.elf
 	qemu-system-x86_64 -s $< &
 	$(GDB) -ex "target remote localhost:1234" -ex "symbol-file $(TARGET_DIR)/kernel.elf"
 
-$(TARGET_DIR)/kernel.elf:  $(OBJECTS)
+$(TARGET_DIR)/kernel.elf: $(KERNEL_SOURCE)/kernel_entry.o $(OBJECTS)
 	$(LD) -o $@ -Ttext 0x1000 -m elf_i386 $^
 
 $(TARGET_DIR)/os_image: $(TARGET_DIR)/bootsector.bin $(TARGET_DIR)/$(TARGET)

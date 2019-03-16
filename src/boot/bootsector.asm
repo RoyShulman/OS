@@ -6,27 +6,29 @@
 [org 0x7c00]
 KERNEL_OFFSET equ 0x1000	; The memory offset to which we load our kernel
 
-	mov [BOOT_DRIVE], dl 	; BIOS stores the boot drive in dl
+mov [BOOT_DRIVE], dl 	; BIOS stores the boot drive in dl
 
-	mov bp, 0x9000			; Setup the stack
-	mov sp, bp
+mov bp, 0x9000			; Setup the stack
+mov sp, bp
 
-	mov bx, MSG_REAL_MODE
-	call print_string
+mov bx, MSG_REAL_MODE
+call print_string
 
-	call load_kernel
- 
-	call switch_to_pm ; Never return
+call load_kernel
+
+call switch_to_pm ; Never return
 
 
-	jmp $
+jmp $
 
 load_kernel:
 	mov bx, MSG_LOAD_KERNEL
+	mov ax, 0
+	mov es, ax
 	call print_string
 
 	mov bx, KERNEL_OFFSET 	; Load the first 15(just to be safe) sectors excluding the boot sector
-	mov dh, 15				; from our boot drive into the address 0x1000 which is the KERNEL_OFFSET
+	mov dh, 15				; from our boot drive into the address 0x1000 which is the es:KERNEL_OFFSET
 	mov dl, [BOOT_DRIVE]
 	call disk_load
 
