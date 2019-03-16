@@ -1,12 +1,8 @@
-#include "utils.h"
+#include "mem.h"
+
+#include "string.h"
 
 #define MAX_STR_LEN		(1500)
-
-void memcpy(char* source, char* dest, int num_bytes) {
-	for (int i = 0; i < num_bytes; i++) {
-		*(dest + i) = *(source + i);
-	}
-}
 
 int itoa(int num, char* str) {
 	if (str == NULL) {

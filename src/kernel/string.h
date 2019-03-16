@@ -1,24 +1,6 @@
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef STRING_H
+#define STRING_H
 
-/**
- * Utils definitions and functions
- */
-
-// To surpress unused veriable error
-#define UNUSED(x) (void)(x)
-
-#define NULL 	(0)
-
-/**
- * @brief      Helper functiont to copy num_bytes from one buffer to the other
- *
- * @param[in]  source     The source buffer to copy from
- * @param[out] dest       The destination buffer to copy to
- * @param[in]  num_bytes  The number of bytes to copy
- *
- */
-void memcpy(char* source, char* dest, int num_bytes);
 
 /**
  * @brief      Convert an int to ascii
@@ -47,5 +29,6 @@ int reverse(char* string);
  * @return       len of the string
  */
 int strlen(char* string);
+
 
 #endif

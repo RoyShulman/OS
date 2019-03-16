@@ -5,7 +5,7 @@
 #include "utils.h"
 #include "isr.h"
 
-void main() {
+void kmain() {
 
 	clear_screen();
 	isr_install();
