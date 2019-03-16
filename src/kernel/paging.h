@@ -40,8 +40,10 @@ typedef struct page_directory
 
 /**
  * @brief      Sets up the environment, page directories and enables paging
+ * 
+ * @return     Returns 0 on success, -1 on error
  */
-void initialise_paging();
+int initialise_paging();
 
 /**
  * @brief      Causes the specified page directory to be loaded into the
