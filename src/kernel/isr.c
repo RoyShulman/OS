@@ -2,7 +2,8 @@
 #include <drivers/IO.h>
 
 #include "idt.h"
-#include "utils.h"
+#include "string.h"
+#include "mem.h"
 
 #include "isr.h"
 

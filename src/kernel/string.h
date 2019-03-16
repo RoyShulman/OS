@@ -30,5 +30,4 @@ int reverse(char* string);
  */
 int strlen(char* string);
 
-
 #endif

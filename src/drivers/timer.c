@@ -1,6 +1,6 @@
 #include <kernel/types.h>
 #include <kernel/isr.h>
-#include <kernel/utils.h>
+#include <kernel/mem.h>
 
 #include "IO.h"
 #include "screen.h"

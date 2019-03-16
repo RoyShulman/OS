@@ -1,4 +1,5 @@
-#include <kernel/utils.h>
+#include <kernel/mem.h>
+#include <kernel/string.h>
 
 #include "IO.h"
 

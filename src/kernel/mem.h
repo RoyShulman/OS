@@ -1,6 +1,8 @@
 #ifndef MEM_H
 #define MEM_H
 
+#include "types.h"
+
 // To surpress unused warning
 #define UNUSED(x) (void)(x)
 
@@ -24,5 +26,27 @@ void memcpy(char* source, char* dest, int num_bytes);
  * @param[in]  num    The number of times to write the value
  */
 void memset(void* ptr, int value, const unsigned int num);
+
+
+/**
+ * @brief      Allocates aligned(0x1000) memory on the heap of sz size
+ * 			   This memory will never be freed!
+ *
+ * @param[in]  sz    The size to allocate
+ *
+ * @return     Virtual address of allocated memory
+ */
+uint32_t kmalloc_a(uint32_t sz);
+
+/**
+ * @brief      Allocates aligned(0x1000) memory on the heap of sz size
+ * 			   This memory will never be freed!
+ *
+ * @param[in]  sz    The size to allocate
+ * @param      phys  The physical address of the virtual address allocated
+ *
+ * @return     Virtual address of allocated memory
+ */
+uint32_t kmalloc_ap(uint32_t sz, uint32_t *phys);
 
 #endif
