@@ -5,7 +5,7 @@
 
 typedef struct page
 {
-   uint32_t paramesent    : 1;   // Page present in memory
+   uint32_t preset    : 1;   // Page present in memory
    uint32_t rw         : 1;   // Read-only if clear, readwrite if set
    uint32_t user       : 1;   // Supervisor level only if clear
    uint32_t accessed   : 1;   // Has the page been accessed since last refresh?

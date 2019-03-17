@@ -72,6 +72,56 @@ static uint32_t first_free_frame() {
 	return NULL; // No free frames left!
 }
 
+/**
+ * @brief      Allocates a frame and connects it to a page
+ *
+ * @param      page       The page to allocate a frame to
+ * @param[in]  privilege  The privilege level of the page
+ * @param[in]  writeable  Is the frame writeable
+ *
+ * @return     { description_of_the_return_value }
+ */
+static int alloc_frame(page_t* page, bool privilege, bool writeable) {
+	if (page == NULL) {
+		return -1;
+	}
+	if (page->frame) {
+		// Page is already allocated, return
+		return 1;
+	}
+	else {
+		uint32_t free_frame = first_free_frame();
+		if (free_frame == NULL) {
+			// No free frames!
+			return -1;
+		}
+		set_frame(free_frame * PAGE_ALIGN_SIZE);// Set a used page in the bitset
+		page->frame = free_frame; 				// Addr of frame
+		page->present = 1;						// Page is preset(it's ours!)
+		page->user = privilege;					// 0 for kernel mode, 1 for user mode
+		page->rw = writeable;					// 1 for read-write, 0 for read only
+	}
+}
+
+/**
+ * @brief      Frees a frame
+ *
+ * @param      page  The page that holds information about that frame
+ */
+static void free_frame(page_t* page) {
+	if (page == NULL) {
+		return;
+	}
+	uint32_t frame = page->frame;
+	if (page->frame == NULL) {
+		// Frame is already free!
+		return;
+	}
+	clear_frame(frame * PAGE_ALIGN_SIZE);	// Clear the page from the bitset
+	page->frame = NULL;
+}
+
+
 int initialise_paging() {
 	nframes = MAX_PAGE_ADDR / PAGE_ALIGN_SIZE;
 	uint32_t nframes_indexes = ADDR_TO_INDEX_BIT(nframes);
@@ -84,7 +134,7 @@ int initialise_paging() {
 	page_directory_t* kernel_directory = (page_directory_t*) kmalloc_a(sizeof(page_directory_t)); 
 	memset(kernel_directory, 0, sizeof(page_directory_t));
 
-	
+
 }
 
 void init_page_fault_handler() {
