@@ -5,71 +5,45 @@
 
 #include "paging.h"
 
-#define PTR_32_BIT_SIZE		(32)
+#define BITS_IN_BYTE		(8)
+#define PTR_32_BIT_SIZE		((BITS_IN_BYTE * sizeof(uint32_t*)))
 #define PTR_32_MAX_SIZE		(0xfffffff) // 2**32 - 1
 #define MAX_PAGE_ADDR		(0x1000000)
 #define PAGE_ALIGN_SIZE		(0x1000)
 #define PAGE_FAULT_INT_NUM	(14)
 
+typedef enum {false, true} bool;
+
 uint32_t nframes; // The number of frames
 
 /*
  * This is a bitset where each bit defines if the frame address is free or used.
- * The number of bits is the number of frames we have.
+ * we use 2 functions to access members of the bitset.
  */
 
-uint32_t* frames;
-
-/*
- *	This macro is to find the index of the frame address in 
- *	the bitset of free/used address. It is also the high bits in the address
- */
-#define ADDR_TO_INDEX_BIT(x)		(x/PTR_32_BIT_SIZE) 
-
-/*
- * This macro is to find the offset in the index, for the 
- * given address. Use this after we found the index
- * to find the offset in the index
- */
-#define ADDR_TO_OFFSET_BIT(x)		(x%PTR_32_BIT_SIZE) // This 
+bool* frames;
 
 // static void set_frame(uint32_t frame_addr) {
 // 	uint32_t frame = frame_addr / PAGE_ALIGN_SIZE; // Frame are alligned to PAGE_ALIGN_SIZE
-// 	uint32_t index = ADDR_TO_INDEX_BIT(frame);
-// 	uint32_t offset = ADDR_TO_OFFSET_BIT(frame);
-// 	frames[index] |= (0x1 << offset); // Set used bit in offset in index
+// 	frames[index] |= true; // Set used bit in offset in index
 // }
 
 // static void clear_frame(uint32_t frame_addr) {
 // 	uint32_t frame = frame_addr / PAGE_ALIGN_SIZE; // Frame are alligned to PAGE_ALIGN_SIZE
-// 	uint32_t index = ADDR_TO_INDEX_BIT(frame);
-// 	uint32_t offset = ADDR_TO_OFFSET_BIT(frame);
-// 	frames[index] &= ~(0x1 << offset); // clear used bit in offset in index
+// 	frames[index] = false; // clear used bit in offset in index
 // }
 
 // static uint32_t is_frame_used(uint32_t frame_addr) { 
 // 	uint32_t frame = frame_addr / PAGE_ALIGN_SIZE; // Frame are alligned to PAGE_ALIGN_SIZE
-// 	uint32_t index = ADDR_TO_INDEX_BIT(frame);
-// 	uint32_t offset = ADDR_TO_OFFSET_BIT(frame);
-// 	return (frames[index] &= ~(0x1 << offset)); 
+// 	return (frames[index] == true); 
 // }
 
 // static uint32_t first_free_frame() { 
-// 	for (unsigned int i = 0; i < ADDR_TO_INDEX_BIT(nframes); i++) {
-// 		// This iterates on all the indexes since nframes holds the
-// 		// highest frame address / PAGE_ALIGN_SIZE 
-		
-// 		if (frames[i] == PTR_32_MAX_SIZE) { // 2**32-1
-// 			// This means in this index all frames are used
-// 			continue;
-// 		}
-// 		for (unsigned int j = 0; j < PTR_32_BIT_SIZE; j++) {
-// 			uint32_t offset_to_test = frames[i] & (1 << j);
-// 			if (!offset_to_test) { 
-// 				// Found a free frame!
-// 				return ((i * PTR_32_BIT_SIZE) + j); // returns an address of a frame / PAGE_ALIGN_SIZE
-// 			}
-// 		}				   
+// 	for (unsigned int i = 0; i < nframes; i++) {
+		// if (!frames[i]) { 
+		// 	// Found a free frame!
+		// 	return i; // returns an address of a frame / PAGE_ALIGN_SIZE
+		// }
 // 	}
 // 	return NULL; // No free frames left!
 // }
@@ -126,12 +100,11 @@ uint32_t* frames;
 
 int initialise_paging() {
 	nframes = MAX_PAGE_ADDR / PAGE_ALIGN_SIZE; // We have 4096 frames
-	uint32_t nframes_indexes = ADDR_TO_INDEX_BIT(nframes); // we have 128 index.
-	frames = (uint32_t*) kmalloc_a(nframes_indexes); // Allocate memory for the frame bitset
+	frames = (bool*) kmalloc_a(nframes); // Allocate memory for the frame bitset
 	if (frames == NULL) {
 		return -1;
 	}
-	memset(frames, 0, nframes_indexes);
+	memset(frames, 0, nframes);
 
 	page_directory_t* kernel_directory = (page_directory_t*) kmalloc_a(sizeof(page_directory_t)); 
 	memset(kernel_directory, 0, sizeof(page_directory_t));
