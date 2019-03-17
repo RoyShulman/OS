@@ -14,24 +14,24 @@
 uint32_t nframes; // The number of frames
 
 /*
- * This is a bitset where each bit defines if the frame address if's free or used.
- * Because it's 32 bit and holds 32 bit pointers, it can hold 1024 pages
+ * This is a bitset where each bit defines if the frame address is free or used.
+ * The number of bits is the number of frames we have.
  */
 
 uint32_t* frames;
 
 /*
  *	This macro is to find the index of the frame address in 
- *	the bitset of free/used address
+ *	the bitset of free/used address. It is also the high bits in the address
  */
-#define ADDR_TO_INDEX_BIT(x)		(x/32) 
+#define ADDR_TO_INDEX_BIT(x)		(x/PTR_32_BIT_SIZE) 
 
 /*
  * This macro is to find the offset in the index, for the 
  * given address. Use this after we found the index
  * to find the offset in the index
  */
-#define ADDR_TO_OFFSET_BIT(x)		(x%32) // This 
+#define ADDR_TO_OFFSET_BIT(x)		(x%PTR_32_BIT_SIZE) // This 
 
 // static void set_frame(uint32_t frame_addr) {
 // 	uint32_t frame = frame_addr / PAGE_ALIGN_SIZE; // Frame are alligned to PAGE_ALIGN_SIZE
@@ -125,8 +125,8 @@ uint32_t* frames;
 
 
 int initialise_paging() {
-	nframes = MAX_PAGE_ADDR / PAGE_ALIGN_SIZE;
-	uint32_t nframes_indexes = ADDR_TO_INDEX_BIT(nframes);
+	nframes = MAX_PAGE_ADDR / PAGE_ALIGN_SIZE; // We have 4096 frames
+	uint32_t nframes_indexes = ADDR_TO_INDEX_BIT(nframes); // we have 128 index.
 	frames = (uint32_t*) kmalloc_a(nframes_indexes); // Allocate memory for the frame bitset
 	if (frames == NULL) {
 		return -1;
