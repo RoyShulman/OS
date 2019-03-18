@@ -12,6 +12,7 @@ disk_load:
 next_group:
 	mov di, 5 ; When reading from disk, failing is common and we are encouraged to try again
 again:
+	mov ah, 0x02 ; 	BIOS read sector function
 	mov al, [SECTORS]
 	int 0x13 ; Do the actual read
 	jc maybe_retry ; If an error occurs the bios will set the carry flag
