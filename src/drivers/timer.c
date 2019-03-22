@@ -11,7 +11,6 @@
 #define TIMER_COMMAND_PORT (0x43)
 #define TIMER_CHANNEL_PORT (0x40)
 
-
 // 32 bit tick counter
 uint32_t tick = 0;
 
@@ -50,7 +49,6 @@ void init_timer(const int frequency) {
 
 	// Set the desired frequency
 	set_frequency(frequency);
-
 }
 
 void destroy_timer() {

@@ -119,7 +119,7 @@ int initialise_paging() {
 	// 	kernel_directory->tablesPhysical[j] = (page_table->pages[j].frame * PAGE_ALIGN_SIZE) | 3;
 	// }
 	kernel_directory->physicalAddr = (uint32_t)&(kernel_directory->tablesPhysical);
-
+	
 	register_page_fault_handler();
 
 	switch_page_directory(kernel_directory);
@@ -129,7 +129,7 @@ int initialise_paging() {
 
 void switch_page_directory(page_directory_t* page_directory) {
 	// Set cr3 to the address that points to the physical addresses of pages
-	__asm__ __volatile__("mov %0, %%cr3":: "r"(&(page_directory->tablesPhysical[0])));
+	__asm__ __volatile__("mov %0, %%cr3":: "r"(page_directory->physicalAddr));
 
 	uint32_t cr0;
 	__asm__ __volatile__("mov %%cr0, %0": "=r"(cr0));

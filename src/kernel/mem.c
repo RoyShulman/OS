@@ -1,6 +1,6 @@
 #include "mem.h"
 
-static uint32_t free_ptr = 0x100000; // Make this large so we don't write over kernel code
+static volatile uint32_t free_ptr = 0x1337; // Make this large so we don't write over kernel code
 
 void memcpy(char* source, char* dest, int num_bytes) {
 	for (int i = 0; i < num_bytes; i++) {
