@@ -7,6 +7,7 @@
 #include "paging.h"
 
 void kmain() {
+	initialise_paging();
 
 	clear_screen();
 	isr_install();
@@ -14,5 +15,4 @@ void kmain() {
 
 	init_timer(100);
 	init_keyboard();
-	initialise_paging();
 }

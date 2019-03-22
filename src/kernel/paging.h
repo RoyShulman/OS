@@ -12,7 +12,7 @@ typedef struct page
    uint32_t dirty      : 1;   // Has the page been written to since last refresh?
    uint32_t unused     : 7;   // Amalgamation of unused and reserved bits
    uint32_t frame      : 20;  // Frame address (shifted right 12 bits)
-} page_t;
+} __attribute__((packed)) page_t;
 
 typedef struct page_table
 {
@@ -69,5 +69,16 @@ void register_page_fault_handler();
  * @brief      Unregisters the page fault handler  
  */
 void destroy_page_fault_handler();
+
+/**
+ * @brief      Retrieves a pointer to a page for a virtual memory address
+ *
+ * @param[in]  address         The physical address the page has
+ * @param[in]  should_alloc    If to allocate the page if it doesn't exist
+ * @param      page_directory  The page directory the page resides in
+ *
+ * @return     The page.
+ */
+page_t* get_page(uint32_t address, bool should_alloc, page_directory_t* page_directory);
 
 #endif
