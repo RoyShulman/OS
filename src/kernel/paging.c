@@ -3,6 +3,7 @@
 #include "mem.h"
 #include "isr.h"
 #include "string.h"
+#include "utils.h"
 
 #include "paging.h"
 
@@ -110,14 +111,14 @@ int initialise_paging() {
 	uint32_t page_dir[1024] __attribute__((aligned(0x1000)));
 	uint32_t first_page_table[1024] __attribute__((aligned(0x1000)));
 
-	memset(page_dir, (uint32_t)0, 1024);
+	// memset(page_dir, (uint32_t)0, 1024);
 
 
 	for (int i = 0; i < 1024; i++) {
 		page_dir[i] = 2;
 	}
 	memset(first_page_table, 0, 1024);
-	for (int i = 0; i < 1024; i++) {
+	for (int i = 0; i < 1000; i++) {
 		first_page_table[i] = (i*0x1000) | 3;
 	}
 	page_dir[0] = ((uint32_t)first_page_table) | 3;
@@ -195,5 +196,5 @@ void page_fault_handler(registers_t regs) {
    	print("user ");
    }
    print("\n");
-
+   PANIC("Page fault");
 }

@@ -94,57 +94,65 @@ void isr_install() {
 
 
 void isr_handler(registers_t r) {
-    /* To print the message which defines every exception */
-    const char *exception_messages[] = {
-    "Division By Zero",
-    "Debug",
-    "Non Maskable Interrupt",
-    "Breakpoint",
-    "Into Detected Overflow",
-    "Out of Bounds",
-    "Invalid Opcode",
-    "No Coprocessor",
-
-    "Double Fault",
-    "Coprocessor Segment Overrun",
-    "Bad TSS",
-    "Segment Not Present",
-    "Stack Fault",
-    "General Protection Fault",
-    "Page Fault",
-    "Unknown Interrupt",
-
-    "Coprocessor Fault",
-    "Alignment Check",
-    "Machine Check",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved"
-    };
-
-
-    print("received interrupt: ");
-    char s[3];
-    if (itoa(r.int_no, s) != 0) {
-        print("Could not convert interrupt digit to ascii!");
+    // handle the interrupt in a moduler way
+    if (interrupt_handlers[r.int_no] != 0) {
+        isr_handler_ptr_t handler = interrupt_handlers[r.int_no];
+        handler(r);
     }
+    // Handle in a dummy way
     else {
-        print(s);
+        /* To print the message which defines every exception */
+        const char *exception_messages[] = {
+        "Division By Zero",
+        "Debug",
+        "Non Maskable Interrupt",
+        "Breakpoint",
+        "Into Detected Overflow",
+        "Out of Bounds",
+        "Invalid Opcode",
+        "No Coprocessor",
+
+        "Double Fault",
+        "Coprocessor Segment Overrun",
+        "Bad TSS",
+        "Segment Not Present",
+        "Stack Fault",
+        "General Protection Fault",
+        "Page Fault",
+        "Unknown Interrupt",
+
+        "Coprocessor Fault",
+        "Alignment Check",
+        "Machine Check",
+        "Reserved",
+        "Reserved",
+        "Reserved",
+        "Reserved",
+        "Reserved",
+
+        "Reserved",
+        "Reserved",
+        "Reserved",
+        "Reserved",
+        "Reserved",
+        "Reserved",
+        "Reserved",
+        "Reserved"
+        };
+
+
+        print("received interrupt: ");
+        char s[3];
+        if (itoa(r.int_no, s) != 0) {
+            print("Could not convert interrupt digit to ascii!");
+        }
+        else {
+            print(s);
+        }
+        print("\n");
+        print(exception_messages[r.int_no]);
+        print("\n");
     }
-    print("\n");
-    print(exception_messages[r.int_no]);
-    print("\n");
 }
     
 void remap_irq() {
