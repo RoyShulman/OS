@@ -47,7 +47,6 @@ uint32_t kmalloc_ap(uint32_t sz, uint32_t *phys) {
 	uint32_t tmp = free_ptr;
 
 	free_ptr += sz;
-
-
+	
 	return tmp;
 }

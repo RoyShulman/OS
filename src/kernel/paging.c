@@ -13,6 +13,9 @@
 #define MAX_PAGE_ADDR		(0x1000000)
 #define PAGE_ALIGN_SIZE		(0x1000)
 #define PAGE_FAULT_INT_NUM	(14)
+#define RW_BIT				(2)
+#define KERNEL_BIT			(0)
+#define PRESENT_BIT			(1)
 
 // uint32_t nframes; // The number of frames
 
@@ -25,7 +28,7 @@ bool* frames;
 
 // // static void set_frame(uint32_t frame_addr) {
 // // 	uint32_t frame = frame_addr / PAGE_ALIGN_SIZE; // Frame are alligned to PAGE_ALIGN_SIZE
-// // 	frames[index] |= true; // Set used bit in offset in index
+// // 	frames[index] = true; // Set used bit in offset in index
 // // }
 
 // // static void clear_frame(uint32_t frame_addr) {
@@ -103,41 +106,30 @@ int initialise_paging() {
 	if (frames == NULL) {
 		return -1;
 	}
-	memset(frames, 0, nframes);
+	memset(frames, false, nframes);
 
 	page_directory_t* kernel_directory = (page_directory_t*) kmalloc_a(sizeof(page_directory_t)); 
 	memset(kernel_directory, 0, sizeof(page_directory_t));
 	
-	uint32_t page_dir[1024] __attribute__((aligned(0x1000)));
-	uint32_t first_page_table[1024] __attribute__((aligned(0x1000)));
+	// Set all the page tables to not present, writeable and kernel mode	
+	for (uint32_t i = 0; i < sizeof(kernel_directory->tablesPhysical); i++) {
+		kernel_directory->tablesPhysical[i] = RW_BIT + KERNEL_BIT;
+	}	
 
-	// memset(page_dir, (uint32_t)0, 1024);
+	// Allocate the first 4mb of pages as rw, present, kernel_mode
+	uint32_t first_table_addr;
+	page_table_t* first_page_table = (page_table_t*)kmalloc_ap(sizeof(page_table_t), &first_table_addr);
 
-
-	for (int i = 0; i < 1024; i++) {
-		page_dir[i] = 2;
+	for (uint32_t i = 0; i < sizeof(first_page_table->pages); i++) {
+		first_page_table->pages[i].frame = i;
+		first_page_table->pages[i].present = 1;
+		first_page_table->pages[i].rw = 1;
 	}
-	memset(first_page_table, 0, 1024);
-	for (int i = 0; i < 1000; i++) {
-		first_page_table[i] = (i*0x1000) | 3;
-	}
-	page_dir[0] = ((uint32_t)first_page_table) | 3;
-	kernel_directory->physicalAddr = (uint32_t)&page_dir;
-
-	// for (int j = 0; j < 1024; j++) {
-	// 	uint32_t tmp;
-	// 	page_table_t* page_table = (page_table_t*)kmalloc_ap(sizeof(page_table_t), &tmp);
-	// 	memset(page_table, 0, sizeof(page_table_t));
-
-	// 	for (int i = 0; i < 1024; i++) {
-	// 		page_table->pages[i].present = 1;
-	// 		page_table->pages[i].rw = 1;
-	// 		page_table->pages[i].frame = i + j*0x1000;
-	// 	}
-	// 	kernel_directory->tables[j] = page_table;
-	// 	kernel_directory->tablesPhysical[j] = tmp | 3;
-	// }
-	// kernel_directory->physicalAddr = (uint32_t)(kernel_directory->tablesPhysical[0]);
+	kernel_directory->tables[0] = first_page_table;
+	// Set the physical address of the first page table in the physical tables array
+	// it is a pointer to the page tables. We also need to set the correct attributes for it
+	kernel_directory->tablesPhysical[0] = first_table_addr | (RW_BIT + KERNEL_BIT + PRESENT_BIT);
+	kernel_directory->physicalAddr = (uint32_t)&(kernel_directory->tablesPhysical);
 
 	register_page_fault_handler();
 
