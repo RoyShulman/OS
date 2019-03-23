@@ -33,6 +33,7 @@ uint32_t kmalloc_ap(uint32_t sz, uint32_t *phys) {
 	if (phys == NULL) {
 		return NULL;
 	}
+	
 	if (free_ptr == 0) {
 		// To overcome a weird bug that static assignment doesn't work`
 		free_ptr = 0x100000;
@@ -42,10 +43,11 @@ uint32_t kmalloc_ap(uint32_t sz, uint32_t *phys) {
 		free_ptr &= 0xFFFFF000;
 		free_ptr += 0x1000;
 	}
+	*phys = free_ptr;
 	uint32_t tmp = free_ptr;
+
 	free_ptr += sz;
 
-	*phys = free_ptr;
 
 	return tmp;
 }
