@@ -2,6 +2,7 @@
 
 #include "mem.h"
 #include "isr.h"
+#include "string.h"
 
 #include "paging.h"
 
@@ -105,21 +106,38 @@ int initialise_paging() {
 
 	page_directory_t* kernel_directory = (page_directory_t*) kmalloc_a(sizeof(page_directory_t)); 
 	memset(kernel_directory, 0, sizeof(page_directory_t));
+	
+	uint32_t page_dir[1024] __attribute__((aligned(0x1000)));
+	uint32_t first_page_table[1024] __attribute__((aligned(0x1000)));
+
+	memset(page_dir, (uint32_t)0, 1024);
+
+
+	for (int i = 0; i < 1024; i++) {
+		page_dir[i] = 2;
+	}
+	memset(first_page_table, 0, 1024);
+	for (int i = 0; i < 1024; i++) {
+		first_page_table[i] = (i*0x1000) | 3;
+	}
+	page_dir[0] = ((uint32_t)first_page_table) | 3;
+	kernel_directory->physicalAddr = (uint32_t)&page_dir;
 
 	// for (int j = 0; j < 1024; j++) {
-	// 	page_table_t* page_table = (page_table_t*)kmalloc_a(sizeof(page_table_t));
+	// 	uint32_t tmp;
+	// 	page_table_t* page_table = (page_table_t*)kmalloc_ap(sizeof(page_table_t), &tmp);
 	// 	memset(page_table, 0, sizeof(page_table_t));
 
 	// 	for (int i = 0; i < 1024; i++) {
 	// 		page_table->pages[i].present = 1;
 	// 		page_table->pages[i].rw = 1;
-	// 		page_table->pages[i].frame = i + j*1024;
+	// 		page_table->pages[i].frame = i + j*0x1000;
 	// 	}
 	// 	kernel_directory->tables[j] = page_table;
-	// 	kernel_directory->tablesPhysical[j] = (page_table->pages[j].frame * PAGE_ALIGN_SIZE) | 3;
+	// 	kernel_directory->tablesPhysical[j] = tmp | 3;
 	// }
-	kernel_directory->physicalAddr = (uint32_t)&(kernel_directory->tablesPhysical);
-	
+	// kernel_directory->physicalAddr = (uint32_t)(kernel_directory->tablesPhysical[0]);
+
 	register_page_fault_handler();
 
 	switch_page_directory(kernel_directory);
@@ -156,6 +174,11 @@ void page_fault_handler(registers_t regs) {
    int reserved = regs.err_code & 0x8;     // Overwritten CPU-reserved bits of page entry?
    int id = regs.err_code & 0x10;          // Caused by an instruction fetch?
 
+   char faulting_addr[256];
+   itoa(fault_address, faulting_addr);
+   print("Address: ");
+   print(faulting_addr);
+   print("\n");
    if(present) { 
    	print("present ");
    }
