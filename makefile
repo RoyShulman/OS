@@ -1,59 +1,36 @@
 workspaceDir=$(CURDIR)
-BOOTDIR=$(workspaceDir)/src/boot
-CC=gcc
-LD=ld
-CFLAGS=-nostdlib -Werror -g -Wextra -Wall -pedantic -std=c11 -m32 -ffreestanding -I$(workspaceDir)/src/
-LDFLAGS=--oformat binary -Ttext 0x1000 -m elf_i386
-SOURCES=$(shell find $(workspaceDir) -name "*.c")
-ASM_SOURCES=$(shell find $(workspaceDir) -name "*.asm" -not -path "$(workspaceDir)/src/boot/*")
-HEADERS=$(shell find $(workspaceDir) -name "*.h")
-OBJECTS=$(SOURCES:%.c=%.o)
-OBJECTS+=$(ASM_SOURCES:%.asm=%.o)
-TARGET_DIR=$(workspaceDir)/src/bin
-TARGET=kernel.bin
-KERNEL_SOURCE=$(workspaceDir)/src/kernel
-GDB=gdb
+export CC=gcc
+export LD=ld
+export CFLAGS=-nostdlib -Werror -g -Wextra -Wall -pedantic -std=c11 -m32 -ffreestanding -I$(workspaceDir)/src/ -fno-PIC
+export LDFLAGS=--oformat binary -m elf_i386  -T linker.ld
+export TARGET_DIR=$(workspaceDir)/bin
+export OBJECTS_DIR=$(workspaceDir)/objects
+SOURCE_DIRS := $(wildcard $(workspaceDir)/src/*/.)
+TARGET=$(TARGET_DIR)/kernel.bin
 
-.PHONY: run
-run: $(TARGET_DIR)/os_image
-	qemu-system-x86_64 $<
+.PHONY: clean debug build
 
-.PHONY: all
-all: $(TARGET_DIR)/os_image
+all: $(TARGET)
 
-.PHONY: debug
-debug: $(TARGET_DIR)/os_image $(TARGET_DIR)/kernel.elf
-	qemu-system-x86_64 -s $< &
-	$(GDB) -ex "target remote localhost:1234" -ex "symbol-file $(TARGET_DIR)/kernel.elf"
+clean:
+	rm -r $(TARGET_DIR)
+	rm -r $(OBJECTS_DIR)
+	for dir in $(SOURCE_DIRS); do \
+		$(MAKE) -C $$(dir) clean; \
+	done
+
+debug: $(TARGET_DIR)/kernel.elf
+
+
+$(TARGET):
+	mkdir -p $(TARGET_DIR)
+	mkdir -p $(OBJECTS_DIR)
+	for dir in $(SOURCE_DIRS); do \
+		$(MAKE) -C $$dir; \
+	done
 
 $(TARGET_DIR)/kernel.elf: $(KERNEL_SOURCE)/kernel_entry.o $(OBJECTS)
 	$(LD) -o $@ -Ttext 0x1000 -m elf_i386 $^
 
-$(TARGET_DIR)/os_image: $(TARGET_DIR)/bootsector.bin $(TARGET_DIR)/$(TARGET)
+$(TARGET_DIR)/os_image: $(TARGET_DIR)/bootsector.bin $(TARGET)
 	cat $^ > $@
-
-$(TARGET_DIR)/%.bin: $(BOOTDIR)/%.asm
-		mkdir $(TARGET_DIR)
-		nasm $< -f bin -I $(BOOTDIR)/ -o $@
-
-$(TARGET_DIR)/$(TARGET): $(KERNEL_SOURCE)/kernel_entry.o $(OBJECTS) # The order here is important, We always want to have kernel_entry first 
-	$(LD) -o $@ $(LDFLAGS) $^ 	
-
-%.o: %.c %.h
-	$(CC) $(CFLAGS) -c $< -o $@
-
-%.o: %.asm
-	nasm $< -f elf32 -I boot/ -o $@
-
-.PHONY: setup
-setup:
-	qemu-img create -f raw -o size=4G hard_disk.raw
-	echo "w" | fdisk -C 208 -H 16 -S 64 hard_disk.raw
-
-.PHONY: clean
-clean:
-	rm -rf $(TARGET_DIR) $(shell find ./src -name "*.o")
-
-
-.PHONY: rebuild
-rebuild: | clean all
