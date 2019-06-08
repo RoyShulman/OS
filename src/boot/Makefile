@@ -1,13 +1,13 @@
-BOOTDIR = boot/
-SOURCES := $(wildcard *.asm)
-OBJECTS := $(SOURCES:%.asm=%.o)
-# OBJECTS := $(OBJECTS_DIR)/$(OBJECTS)
+workspaceDir:=$(CURDIR)
+BOOTDIR := boot/
+TARGET := bootsector.elf
+OBJECT := $(TARGET:%.elf=%.o)
 
-build: $(OBJECTS)
+.PHONY: build
+build: $(TARGET)
 
-.PHONY: clean
-clean:
-	rm $(OBJECTS)
+$(TARGET): $(OBJECTS_DIR)/$(OBJECT)
+	$(LD) $(LDFLAGS) $< -o $(TARGET_DIR)/$@
 
-%.o: %.asm
-	nasm $< -f elf32 -I $(OBJECTS_DIR) -o $(OBJECTS_DIR)$@
+$(OBJECTS_DIR)/%.o: %.asm
+	nasm $< -f elf -I $(workspaceDir) -o $@
