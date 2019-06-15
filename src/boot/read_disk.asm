@@ -36,7 +36,7 @@ done:
 ; Print the return code of interrupt
 disk_error:
 	mov bx, DISK_ERROR_MESSAGE
-	call print_string
+	call print_string_16
 	mov dh, ah
 	call print_hex
 	jmp $

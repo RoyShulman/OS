@@ -20,7 +20,7 @@ less_then_a:
 
 end_print_hex:
 	mov bx, HEX_OUT
-	call print_string
+	call print_string_16
 	popa
 	ret
 

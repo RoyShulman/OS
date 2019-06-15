@@ -1,19 +1,19 @@
 [bits 16]
 ; bx is the register that holds the address of the string
-print_string:
+print_string_16:
     pusha
     mov ah, 0x0e ; int 0x10 with ah = 0x0e -> means scrolling teletype
 
-loop:
+print_string_16_loop:
     cmp [bx], byte 0
-    je endloop
+    je print_string_16_end_loop
 
     mov al, [bx]
     int 0x10
     inc bx
-    jmp loop
+    jmp print_string_16_loop
 
-endloop:
+print_string_16_end_loop:
     popa
     ret
 
