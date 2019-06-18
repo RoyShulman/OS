@@ -1,9 +1,7 @@
 workspaceDir:=$(CURDIR)
-BOOTDIR := boot/
-TARGET := bootsector.elf
-OBJECT := $(TARGET:%.elf=%.o)
+TARGET := bootsector.bin
+OBJECT := $(TARGET:%.bin=%.o)
 
-.PHONY: build
 build: $(TARGET)
 
 $(TARGET): $(OBJECTS_DIR)/$(OBJECT)
